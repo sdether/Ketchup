@@ -42,9 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\Bucket.cs" />
+    <Compile Include="Config\KetchupConfigSection.cs" />
     <Compile Include="Config\Node.cs" />
     <Compile Include="Config\KetchupConfig.cs" />
-    <Compile Include="Config\KetchupConfigSectionHandler.cs" />
     <Compile Include="Config\NodeList.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="KetchupClient.cs" />

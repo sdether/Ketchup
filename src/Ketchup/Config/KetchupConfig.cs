@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
+using System.Configuration;
 
 namespace Ketchup.Config {
 	public class KetchupConfig {
@@ -67,6 +68,9 @@ namespace Ketchup.Config {
 		}
 
 		public KetchupConfig Init() {
+			bucketNodes = new Dictionary<Bucket, IList<Node>>();
+			nodes = new NodeList();
+
 			foreach(var bucket in buckets){
 				/* there are 3 options for buckets: nodes defined, port defined, all endpoints
 				 * there are 2 options for nodes: ip defined, ip+port defined
