@@ -1,0 +1,10 @@
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup\bin\Debug\Ketchup.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup\bin\Debug\Ketchup.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup\obj\Debug\Ketchup.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup\obj\Debug\Ketchup.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\obj\Debug\Ketchup.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\bin\Debug\Ketchup.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\bin\Debug\Ketchup.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\obj\Debug\Ketchup.pdb

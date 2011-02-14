@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="74a0ec55-0f2c-4d2b-a7f4-02a41649b328" name="jsirota@LA-JSIROTA 2011-02-08 23:52:31" runUser="INTRANET\jsirota" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Local" id="217dd782-73c8-4066-8aa7-b58d74263e98">
+    <Description>These are default test settings for a local test run.</Description>
+    <Deployment enabled="false" runDeploymentRoot="jsirota_LA-JSIROTA 2011-02-08 23_52_31">
+      <DeploymentItem filename="C:\Users\jsirota\Documents\Code\Ketchup\lib\SpecFlow\TechTalk.SpecFlow.dll" />
+    </Deployment>
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2011-02-08T23:52:31.8170595-08:00" queuing="2011-02-08T23:52:31.8290602-08:00" start="2011-02-08T23:52:31.8430610-08:00" finish="2011-02-08T23:52:32.3170881-08:00" />
+  <ResultSummary outcome="Inconclusive">
+    <Counters total="1" executed="1" error="0" failed="0" timeout="0" aborted="0" inconclusive="1" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" passed="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="AddANewValue" storage="c:\users\jsirota\documents\code\ketchup\src\ketchup\ketchup.spec\bin\debug\ketchup.spec.dll" id="75a2ca2e-adad-7ffa-cbd1-0254a7b4f94e">
+      <Description>Add a new value</Description>
+      <Execution id="518b6095-7ec8-45f1-bf6b-fb4ead1d46e0" />
+      <Properties>
+        <Property>
+          <Key>FeatureTitle</Key>
+          <Value>Commands</Value>
+        </Property>
+      </Properties>
+      <TestMethod codeBase="C:/Users/jsirota/Documents/Code/Ketchup/src/Ketchup/Ketchup.Spec/bin/Debug/Ketchup.Spec.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="Ketchup.Spec.Features.CommandsFeature, Ketchup.Spec, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="AddANewValue" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="75a2ca2e-adad-7ffa-cbd1-0254a7b4f94e" executionId="518b6095-7ec8-45f1-bf6b-fb4ead1d46e0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="518b6095-7ec8-45f1-bf6b-fb4ead1d46e0" testId="75a2ca2e-adad-7ffa-cbd1-0254a7b4f94e" testName="AddANewValue" computerName="LA-JSIROTA" duration="00:00:00.0594760" startTime="2011-02-08T23:52:31.9140651-08:00" endTime="2011-02-08T23:52:32.2380836-08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Inconclusive" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="518b6095-7ec8-45f1-bf6b-fb4ead1d46e0">
+      <Output>
+        <StdOut>Given a new Ketchup client
+-&gt; No matching step definition found for the step. Use the following code to create one:
+    [Binding]
+public class StepDefinitions
+{
+    [Given(@"a new Ketchup client")]
+public void GivenANewKetchupClient()
+{
+    ScenarioContext.Current.Pending();
+}
+    }
+
+When Add is executed with a key and a value
+-&gt; No matching step definition found for the step. Use the following code to create one:
+    [Binding]
+public class StepDefinitions
+{
+    [When(@"Add is executed with a key and a value")]
+public void WhenAddIsExecutedWithAKeyAndAValue()
+{
+    ScenarioContext.Current.Pending();
+}
+    }
+
+And the key does not exist
+-&gt; No matching step definition found for the step. Use the following code to create one:
+    [Binding]
+public class StepDefinitions
+{
+    [When(@"the key does not exist")]
+public void WhenTheKeyDoesNotExist()
+{
+    ScenarioContext.Current.Pending();
+}
+    }
+
+Then the value should be added
+-&gt; No matching step definition found for the step. Use the following code to create one:
+    [Binding]
+public class StepDefinitions
+{
+    [Then(@"the value should be added")]
+public void ThenTheValueShouldBeAdded()
+{
+    ScenarioContext.Current.Pending();
+}
+    }</StdOut>
+        <ErrorInfo>
+          <Message>Assert.Inconclusive failed. No matching step definition found for one or more steps.
+[Binding]
+public class StepDefinitions
+{
+    [Given(@"a new Ketchup client")]
+public void GivenANewKetchupClient()
+{
+    ScenarioContext.Current.Pending();
+}
+    
+    [Then(@"the value should be added")]
+public void ThenTheValueShouldBeAdded()
+{
+    ScenarioContext.Current.Pending();
+}
+    
+    [When(@"Add is executed with a key and a value")]
+public void WhenAddIsExecutedWithAKeyAndAValue()
+{
+    ScenarioContext.Current.Pending();
+}
+    
+    [When(@"the key does not exist")]
+public void WhenTheKeyDoesNotExist()
+{
+    ScenarioContext.Current.Pending();
+}
+}
+</Message>
+          <StackTrace>   at lambda_method(Closure , String , Object[] )
+   at TechTalk.SpecFlow.UnitTestProvider.MsTestRuntimeProvider.TestInconclusive(String message)
+   at TechTalk.SpecFlow.ErrorHandling.ErrorProvider.ThrowPendingError(TestStatus testStatus, String message)
+   at TechTalk.SpecFlow.TestRunner.CollectScenarioErrors()
+   at Ketchup.Spec.Features.CommandsFeature.AddANewValue() in c:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\Features\Commands.feature:line 11
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>

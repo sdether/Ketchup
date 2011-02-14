@@ -1,0 +1,17 @@
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\bin\Debug\Ketchup.Spec.dll.config
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\bin\Debug\Ketchup.Spec.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\bin\Debug\Ketchup.Spec.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\bin\Debug\TechTalk.SpecFlow.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\obj\Debug\Ketchup.Spec.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\obj\Debug\Ketchup.Spec.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\bin\Debug\Ketchup.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup\Ketchup.Spec\bin\Debug\Ketchup.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\bin\Debug\Ketchup.Spec.dll.config
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\bin\Debug\Ketchup.Spec.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\bin\Debug\Ketchup.Spec.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\bin\Debug\Ketchup.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\bin\Debug\Ketchup.pdb
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\obj\Debug\Ketchup.Spec.dll
+C:\Users\jsirota\Documents\Code\Ketchup\src\Ketchup.Spec\obj\Debug\Ketchup.Spec.pdb
