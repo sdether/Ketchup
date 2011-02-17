@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Configuration;
+using Ketchup;
 
 namespace Ketchup.Config {
 	public class KetchupConfig {
@@ -12,6 +13,16 @@ namespace Ketchup.Config {
 
 		private IList<Bucket> buckets = new List<Bucket>();
 		private IList<string> configNodes = new List<string>();
+
+		private static KetchupConfig current = null;
+		public static KetchupConfig Current {
+			get {
+				if (current == null)
+					throw new ConfigurationErrorsException("Current KetchupConfig has not be initialized, please specify configuration by calling Init()");
+
+				return current;
+			}
+		}
 
 		#region settings
 
@@ -45,6 +56,11 @@ namespace Ketchup.Config {
 		/// </summary>
 		public int ConnectionRetryCount { get; set; }
 
+		/// <summary>
+		/// hashing algorithm to use, default or ketama
+		/// </summary>
+		public HashingAlgortihm HashingAlgorithm { get; set; }
+
 		#endregion
 
 		public KetchupConfig() {
@@ -54,6 +70,7 @@ namespace Ketchup.Config {
 			ConnectionRetryCount = 2;
 			ConnectionTimeout = new TimeSpan(0,0,0,0,500);
 			DeadNodeRetryDelay = new TimeSpan(0,0,1);
+			HashingAlgorithm = HashingAlgortihm.Default;
 		}
 
 		public KetchupConfig AddBucket(Bucket bucket) {
@@ -94,6 +111,7 @@ namespace Ketchup.Config {
 				InitAllNodes(bucket);
 			}
 
+			current = this;
 			return this;
 		}
 
