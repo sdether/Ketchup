@@ -9,9 +9,8 @@ using Ketchup;
 namespace Ketchup.Config {
 	public class KetchupConfig {
 		private NodeList nodes = null;
-		private IDictionary<Bucket, IList<Node>> bucketNodes = null;
-
-		private IList<Bucket> buckets = new List<Bucket>();
+		private IDictionary<string, IList<Node>> bucketNodes = null;
+		private IDictionary<string, Bucket> buckets = new Dictionary<string,Bucket>();
 		private IList<string> configNodes = new List<string>();
 
 		private static KetchupConfig current = null;
@@ -74,7 +73,7 @@ namespace Ketchup.Config {
 		}
 
 		public KetchupConfig AddBucket(Bucket bucket) {
-			buckets.Add(bucket);
+			buckets.Add(bucket.Name, bucket);
 			return this;
 		}
 
@@ -84,17 +83,25 @@ namespace Ketchup.Config {
 			return this;
 		}
 
+		public IList<Node> GetNodes(string bucket) {
+			return bucketNodes[bucket];
+		}
+
+		public string GetKey(string key, string bucket) {
+			return buckets[bucket].Prefix ? bucket + "-" + key : key;
+		}
+
 		public KetchupConfig Init() {
-			bucketNodes = new Dictionary<Bucket, IList<Node>>();
+			bucketNodes = new Dictionary<string, IList<Node>>();
 			nodes = new NodeList();
 
-			foreach(var bucket in buckets){
+			foreach(var bucket in buckets.Values){
 				/* there are 3 options for buckets: nodes defined, port defined, all endpoints
 				 * there are 2 options for nodes: ip defined, ip+port defined
 				 */
 
 				//first add it to the bucket hash and initialize the nodelist
-				bucketNodes.Add(bucket, new List<Node>());
+				bucketNodes.Add(bucket.Name, new List<Node>());
 
 				//option 1: nodes are defined, if port is defined, use port, otherwise use default port
 				if (bucket.ConfigNodes.Count > 0) {
@@ -118,7 +125,7 @@ namespace Ketchup.Config {
 		private void InitPortNodes(Bucket bucket) {
 			foreach (var cn in configNodes) {
 				var host = cn.Split(':')[0];
-				bucketNodes[bucket].Add(
+				bucketNodes[bucket.Name].Add(
 					nodes.GetOrCreate(host + ":" + bucket.Port.ToString())
 				);
 			}
@@ -126,12 +133,12 @@ namespace Ketchup.Config {
 
 		private void InitAllNodes(Bucket bucket) {
 			foreach (var cn in configNodes)
-				bucketNodes[bucket].Add(nodes.GetOrCreate(cn));
+				bucketNodes[bucket.Name].Add(nodes.GetOrCreate(cn));
 		}
 
 		private void InitSpecifiedNodes(Bucket bucket) {
 			foreach (var ep in bucket.ConfigNodes)
-				bucketNodes[bucket].Add(
+				bucketNodes[bucket.Name].Add(
 					nodes.GetOrCreate(ep)
 				);
 		}

@@ -11,7 +11,7 @@ namespace Ketchup {
 		/// </summary>
 		public KetchupClient() { }
 
-		public KetchupClient Get<T>(string key, Action<T, ushort> success, Action<Exception> error) {
+		public KetchupClient Get<T>(string key, Action<T> success, Action<Exception> error) {
 			try {
 				//Protocol.Get(key, success);
 			} catch (Exception ex) {
@@ -21,7 +21,7 @@ namespace Ketchup {
 			return this;
 		}
 
-		public KetchupClient Get(string key, Action<ArraySegment<byte>, ushort> success, Action<Exception> error) {
+		public KetchupClient Get(string key, Action<ArraySegment<byte>> success, Action<Exception> error) {
 			throw new NotImplementedException();
 		}
 

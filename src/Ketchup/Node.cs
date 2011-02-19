@@ -8,9 +8,9 @@ using Ketchup.Config;
 using System.Threading;
 
 namespace Ketchup {
-	
-	internal class Node {
+	public class Node {
 		private KetchupConfig config = KetchupConfig.Current;
+		private Socket socket = null;
 
 		public int		Port					{ get; set; }
 		public int		CurrentRetryCount		{ get; set; }
@@ -37,7 +37,7 @@ namespace Ketchup {
 		}
 
 		public Node Connect() {
-			var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			//TODO determine if nodelay from enyim actually makes a difference
 			//socket.NoDelay = true;
 
@@ -90,6 +90,25 @@ namespace Ketchup {
 
 			IsDead = true;
 			DeadAt = LastConnectionFailure;
+			socket = null;
+			return this;
+		}
+
+		public Node Request(byte[] packet, Action<IList<ArraySegment<byte>>> callback) {
+			if (socket == null) throw new ArgumentNullException("The socket is not initialized or is dead");
+
+			socket.BeginSend(packet, 0, packet.Length,SocketFlags.None,
+				arSend => { 
+					var buffer = new List<ArraySegment<byte>>();
+					((Socket)arSend).BeginReceive(buffer, SocketFlags.None, 
+						arReceive => {
+							callback(buffer);
+						}
+						
+						,socket);
+				}
+				,socket);
+
 			return this;
 		}
 

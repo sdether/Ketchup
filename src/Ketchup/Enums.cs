@@ -9,4 +9,5 @@ namespace Ketchup {
 		Default,
 		Ketama
 	}
+
 }
