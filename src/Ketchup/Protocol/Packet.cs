@@ -86,6 +86,7 @@ namespace Ketchup.Protocol {
 		}
 
 		public Packet<T> Extras(byte[] returnb, int index, short length) {
+			_extrasb = new byte[length];
 			Array.Copy(returnb, index, _extrasb, 0, length);
 			return this;
 		}
@@ -102,6 +103,7 @@ namespace Ketchup.Protocol {
 		}
 
 		public Packet<T> Key(byte[] returnb, int index, short length) {
+			_keyb = new byte[length];
 			Array.Copy(returnb, index, _keyb, 0, length);
 			return this;
 		}

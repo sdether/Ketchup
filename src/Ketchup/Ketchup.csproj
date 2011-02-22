@@ -55,7 +55,7 @@
     <Compile Include="KetchupClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Asynchronous\GetExtensions.cs" />
-    <Compile Include="Protocol\NodeExtensions.cs" />
+    <Compile Include="Hashing\Hashing.cs" />
     <Compile Include="Protocol\PacketExtensions.cs" />
     <Compile Include="Protocol\ProtocolExceptions.cs" />
   </ItemGroup>
