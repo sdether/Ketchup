@@ -44,6 +44,8 @@
     <Compile Include="Algorithms\CRC32.cs" />
     <Compile Include="Bucket.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
+    <Compile Include="Protocol\Key.cs" />
+    <Compile Include="Protocol\Operations.cs" />
     <Compile Include="Protocol\Packet.cs" />
     <Compile Include="Protocol\Enums.cs" />
     <Compile Include="Node.cs" />
@@ -52,12 +54,12 @@
     <Compile Include="Enums.cs" />
     <Compile Include="KetchupClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Protocol\Operations\GetExtensions.cs" />
+    <Compile Include="Asynchronous\GetExtensions.cs" />
     <Compile Include="Protocol\NodeExtensions.cs" />
+    <Compile Include="Protocol\PacketExtensions.cs" />
+    <Compile Include="Protocol\ProtocolExceptions.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Memcached\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,13 +6,14 @@ using System.Configuration;
 
 namespace Ketchup.Config {
 	public class KetchupConfigSection : ConfigurationSection {
-		
+
+		private static KetchupConfigSection instance = null;
 		/// <summary>
 		/// Singleton Instance
 		/// </summary>
 		/// <returns></returns>
 		public static KetchupConfigSection Instance() {
-			return (KetchupConfigSection)ConfigurationManager.GetSection("ketchup") ??
+			return ((KetchupConfigSection)ConfigurationManager.GetSection("ketchup")) ??
 				new KetchupConfigSection();
 		}
 

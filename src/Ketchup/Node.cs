@@ -9,7 +9,6 @@ using System.Threading;
 
 namespace Ketchup {
 	public class Node {
-		private KetchupConfig config = KetchupConfig.Current;
 		private Socket socket = null;
 
 		public int		Port					{ get; set; }
@@ -36,7 +35,8 @@ namespace Ketchup {
 			Port = port;
 		}
 
-		public Node Connect() {
+		public bool Connect() {
+			KetchupConfig config = KetchupConfig.Current;
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			//TODO determine if nodelay from enyim actually makes a difference
 			//socket.NoDelay = true;
@@ -45,7 +45,7 @@ namespace Ketchup {
 				throw new ArgumentNullException("Host is null or empty string, cannot connect to socket");
 
 			if (Port == default(int))
-				throw new ArgumentNullException("Port is not valid for this Node, cannot connect to scoket");
+				throw new ArgumentNullException("Port is not valid for this Node, cannot connect to socket");
 
 			//if either the send or the receive times out, throw the connection timeout;
 			socket.SendTimeout = socket.ReceiveTimeout = config.ConnectionTimeout.Milliseconds;
@@ -66,10 +66,11 @@ namespace Ketchup {
 				}
 			}
 
-			return this;
+			return true;
 		}
 
 		private bool ReadyToTry() {
+			KetchupConfig config = KetchupConfig.Current;
 			if(LastConnectionFailure == DateTime.MinValue)
 				return true;
 			
@@ -79,7 +80,8 @@ namespace Ketchup {
 			return true;
 		}
 
-		private Node HandleTimeout() {
+		private bool HandleTimeout() {
+			KetchupConfig config = KetchupConfig.Current;
 			LastConnectionFailure = DateTime.Now;
 			
 			//haven't reached the max retries yet, let's try again until we do
@@ -91,28 +93,40 @@ namespace Ketchup {
 			IsDead = true;
 			DeadAt = LastConnectionFailure;
 			socket = null;
-			return this;
+			return false;
 		}
 
-		public Node Request(byte[] packet, Action<IList<ArraySegment<byte>>> callback) {
-			if (socket == null) throw new ArgumentNullException("The socket is not initialized or is dead");
+		public Node Request(byte[] packet, Action<byte[]> callback, Action<Exception> error) {
+			if(IsDead) 
+				throw new Exception("Node is dead");
 
-			socket.BeginSend(packet, 0, packet.Length,SocketFlags.None,
-				arSend => { 
-					var buffer = new List<ArraySegment<byte>>();
-					((Socket)arSend).BeginReceive(buffer, SocketFlags.None, 
-						arReceive => {
-							callback(buffer);
-						}
-						
-						,socket);
-				}
-				,socket);
+			//TODO: Make connect async
+			if (socket == null)
+				if (!Connect()) throw new Exception("Connect Failed");
+
+			
+			socket.BeginSend(packet, 0, packet.Length, SocketFlags.None,
+				sendState => {
+					try {
+						((Socket)sendState.AsyncState).EndSend(sendState);
+					} catch(Exception ex) {
+						error(ex);
+					}
+				},socket);
+
+			var buffer = new byte[1024];
+			socket.BeginReceive(buffer, 0, 1024, SocketFlags.None,
+				receiveState => {
+					try {
+						((Socket)receiveState.AsyncState).EndReceive(receiveState);
+						callback(buffer);
+					} catch (Exception ex) {
+						error(ex);
+					}
+				}, socket);
 
 			return this;
 		}
-
-		//TODO construct async wrapper on node to mimic socket connection, per a_robson, socket wrapper.
 	}
 }
 

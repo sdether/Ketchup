@@ -16,7 +16,7 @@ namespace Ketchup {
 			var host = endpoint.Split(':')[0];
 
 			var port = GetPort(endpoint);
-			var id = host + ":" + port.ToString();
+			var id = host + ":" + port;
 
 			Node node = GetById(id);
 			if(node != null)

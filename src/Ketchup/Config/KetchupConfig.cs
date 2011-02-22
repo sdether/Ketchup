@@ -126,7 +126,7 @@ namespace Ketchup.Config {
 			foreach (var cn in configNodes) {
 				var host = cn.Split(':')[0];
 				bucketNodes[bucket.Name].Add(
-					nodes.GetOrCreate(host + ":" + bucket.Port.ToString())
+					nodes.GetOrCreate(host + ":" + bucket.Port)
 				);
 			}
 		}

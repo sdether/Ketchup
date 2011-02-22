@@ -18,7 +18,7 @@ namespace Ketchup.Protocol {
 		InvalidArguments = 0x0004,
 		ItemNotStored = 0x0005,
 		IncrDecrNonNumeric = 0x0006,
-		VBucketIncorrectServer = 0x0007,
+		InvalidVBucketServer = 0x0007,
 		AuthError = 0x0008,
 		AuthContinue = 0x0009,
 		UnknownCommand = 0x0081,
