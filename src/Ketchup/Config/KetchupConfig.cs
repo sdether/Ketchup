@@ -16,8 +16,11 @@ namespace Ketchup.Config {
 		private static KetchupConfig current = null;
 		public static KetchupConfig Current {
 			get {
+				if (current == null && KetchupConfigSection.Current == null)
+					throw new ConfigurationErrorsException("Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file." );
+
 				if (current == null)
-					throw new ConfigurationErrorsException("Current KetchupConfig has not be initialized, please specify configuration by calling Init()");
+					current = KetchupConfigSection.Current.ToKetchupConfig().Init();
 
 				return current;
 			}
@@ -72,6 +75,15 @@ namespace Ketchup.Config {
 			HashingAlgorithm = HashingAlgortihm.Default;
 		}
 
+		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true) {
+			AddBucket(new Bucket() {
+				Name = name,
+				Port = port,
+				Prefix = prefix
+			});
+			return this;
+		}
+
 		public KetchupConfig AddBucket(Bucket bucket) {
 			buckets.Add(bucket.Name, bucket);
 			return this;
@@ -91,7 +103,12 @@ namespace Ketchup.Config {
 			return buckets[bucket].Prefix ? bucket + "-" + key : key;
 		}
 
-		public KetchupConfig Init() {
+		public static KetchupConfig Init(KetchupConfig config) {
+			current = config.Init();
+			return config;
+		}
+
+		internal KetchupConfig Init() {
 			bucketNodes = new Dictionary<string, IList<Node>>();
 			nodes = new NodeList();
 

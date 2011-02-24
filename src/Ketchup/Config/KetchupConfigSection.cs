@@ -12,9 +12,11 @@ namespace Ketchup.Config {
 		/// Singleton Instance
 		/// </summary>
 		/// <returns></returns>
-		public static KetchupConfigSection Instance() {
-			return ((KetchupConfigSection)ConfigurationManager.GetSection("ketchup")) ??
-				new KetchupConfigSection();
+		public static KetchupConfigSection Current {
+			get {
+				var section = ConfigurationManager.GetSection("ketchup") as KetchupConfigSection;
+				return section;
+			}
 		}
 
 		[ConfigurationProperty("nodes")]
@@ -41,7 +43,7 @@ namespace Ketchup.Config {
 			}
 		}
 
-		public KetchupConfig Create() {
+		internal KetchupConfig ToKetchupConfig() {
 			var config = new KetchupConfig();
 
 			//nodes;

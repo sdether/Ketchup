@@ -17,6 +17,10 @@ namespace Ketchup.Protocol {
 			_headerb[0] = (byte)Protocol.Magic.Request; //magic default
 		}
 
+		public Packet(Op operation) {
+			Operation(operation);
+		}
+
 		#region fluent
 
 		public Packet<T> Magic(Magic magic) {

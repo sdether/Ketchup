@@ -12,15 +12,16 @@ namespace Ketchup {
 		/// <summary>
 		/// Creates a new instance of the ketchup client with no configuration
 		/// </summary>
-		public KetchupClient()
-			: this(KetchupConfigSection.Instance().Create(), "default") {
+		public KetchupClient() {
+			Bucket = "default";
 		}
 
-		public KetchupClient(string bucket) 
-			: this(KetchupConfigSection.Instance().Create(), bucket) {
+		public KetchupClient(string bucket) {
+			Bucket = bucket;
 		}
 
-		public KetchupClient(KetchupConfig config, string bucket){
+		public KetchupClient(KetchupConfig config, string bucket) {
+			KetchupConfig.Init(config);
 			Bucket = bucket;
 		}
 

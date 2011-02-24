@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.Demo", "Ketchup.Demo\Ketchup.Demo.csproj", "{27BBE267-922F-4332-96F9-FDFC39D59907}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.Tests", "Ketchup.Tests\Ketchup.Tests.csproj", "{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Ketchup.vsmdi
@@ -45,6 +47,16 @@ Global
 		{27BBE267-922F-4332-96F9-FDFC39D59907}.Release|Mixed Platforms.Build.0 = Release|x86
 		{27BBE267-922F-4332-96F9-FDFC39D59907}.Release|x86.ActiveCfg = Release|x86
 		{27BBE267-922F-4332-96F9-FDFC39D59907}.Release|x86.Build.0 = Release|x86
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

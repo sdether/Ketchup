@@ -17,8 +17,8 @@ namespace Ketchup.Demo {
 		}
 
 		public static void CreateConfigSection() {
-			var section = KetchupConfigSection.Instance();
-			var config = section.Create();
+			var section = KetchupConfigSection.Current;
+			var config = KetchupConfig.Current;
 		}
 
 		public static void GetValueWithKey() {
