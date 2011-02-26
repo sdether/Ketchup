@@ -139,18 +139,17 @@ namespace Ketchup.Tests {
 				//hit
 				val => {
 					block = false;
-					Assert.Null(val);
+					exb = new Exception("Hit fired. Was expecting miss");
 				},
 				//miss
 				() => {
 					block = false;
-					Assert.NotNull(1);
+					Assert.True(true);
 				},
 				//error
 				ex => {
 					block = false;
 					exb = ex;
-					throw ex;
 				});
 
 			//have to block to wait for the async op to complete, otherwise method returns pass;
@@ -162,8 +161,6 @@ namespace Ketchup.Tests {
 
 			if (exb != null)
 				throw exb;
-
-
 		}
 
 		private static KetchupConfig BuildConfiguration() {
