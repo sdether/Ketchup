@@ -1,0 +1,22 @@
+To install:
+
+MAKE SURE YOU UNBLOCK ALL OF THE FILES!
+
+Right-click -> Properties -> Unblock
+
+1. Create a folder called xunitcontrib in C:\Program Files\JetBrains\ReSharper\vX.X\Bin\plugins
+   Where vX.X is the appropriate version of resharper and look in C:\Program Files (x86)\... on a 64 bit machine)
+2. Choose the xunitcontrib.runner.resharper folder for the appropriate version of resharper
+   Note that 5.1 supports 5.1 RTM, 5.1.1 and 5.1.2
+3. Copy the files from this xunitcontrib.runner.resharper.X.X folder into the plugins\xunitcontrib folder
+   DO NOT REPLACE THE VERSION OF xunit.dll!
+
+To install the live templates:
+
+1. Create a folder for the live template xml file to live
+   I choose C:\Users\<username>\ReSharper
+2. Copy *one* of xunit-ae.xml or xunit-xe.xml to this folder
+   The files have the same templates, but different shortcuts to avoid clashes with e.g. nunit
+   ...-ae.xml uses shortcuts beginning with "a" for "assert"
+   ...-xe.xml uses shortcuts beginning with "x" for "xunit"
+3. Mount a live template in Visual Studio (ReSharper -> Live Templates -> Mount file storage) and point to the copied file

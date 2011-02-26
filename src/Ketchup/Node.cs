@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
+using System.Configuration;
 using System.Net.Sockets;
 using Ketchup.Config;
-using System.Threading;
 
 namespace Ketchup {
 	public class Node {
-		private Socket socket = null;
+		private Socket socket;
 
 		public int		Port					{ get; set; }
 		public int		CurrentRetryCount		{ get; set; }
@@ -36,16 +32,16 @@ namespace Ketchup {
 		}
 
 		public bool Connect() {
-			KetchupConfig config = KetchupConfig.Current;
+			var config = KetchupConfig.Current;
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			//TODO determine if nodelay from enyim actually makes a difference
 			//socket.NoDelay = true;
 
 			if (string.IsNullOrEmpty(Host))
-				throw new ArgumentNullException("Host is null or empty string, cannot connect to socket");
+				throw new Exception("Host is null or empty string, cannot connect to socket");
 
 			if (Port == default(int))
-				throw new ArgumentNullException("Port is not valid for this Node, cannot connect to socket");
+				throw new Exception("Port is not valid for this Node, cannot connect to socket");
 
 			//if either the send or the receive times out, throw the connection timeout;
 			socket.SendTimeout = socket.ReceiveTimeout = config.ConnectionTimeout.Milliseconds;
@@ -62,7 +58,7 @@ namespace Ketchup {
 					case SocketError.TimedOut:
 						return HandleTimeout();
 					default:
-						throw ex;
+						throw;
 				}
 			}
 
@@ -70,18 +66,15 @@ namespace Ketchup {
 		}
 
 		private bool ReadyToTry() {
-			KetchupConfig config = KetchupConfig.Current;
+			var config = KetchupConfig.Current;
 			if(LastConnectionFailure == DateTime.MinValue)
 				return true;
 			
-			if((DateTime.Now - LastConnectionFailure) < config.ConnectionRetryDelay )
-				return false;
-
-			return true;
+			return (DateTime.Now - LastConnectionFailure) >= config.ConnectionRetryDelay;
 		}
 
 		private bool HandleTimeout() {
-			KetchupConfig config = KetchupConfig.Current;
+			var config = KetchupConfig.Current;
 			LastConnectionFailure = DateTime.Now;
 			
 			//haven't reached the max retries yet, let's try again until we do
@@ -96,7 +89,7 @@ namespace Ketchup {
 			return false;
 		}
 
-		public Node Request(byte[] packet, Action<byte[]> callback, Action<Exception> error) {
+		public Node Request(byte[] packet, Action<byte[]> callback) {
 			if(IsDead) 
 				throw new Exception("Node is dead");
 
@@ -104,28 +97,33 @@ namespace Ketchup {
 			if (socket == null)
 				if (!Connect()) throw new Exception("Connect Failed");
 
-			
-			socket.BeginSend(packet, 0, packet.Length, SocketFlags.None,
-				sendState => {
-					try {
+
+			if (socket != null)
+				socket.BeginSend(packet, 0, packet.Length, SocketFlags.None,
+					sendState => {
 						((Socket)sendState.AsyncState).EndSend(sendState);
-					} catch(Exception ex) {
-						error(ex);
-					}
-				},socket);
+					},socket);
 
 			var buffer = new byte[1024];
-			socket.BeginReceive(buffer, 0, 1024, SocketFlags.None,
-				receiveState => {
-					try {
-						((Socket)receiveState.AsyncState).EndReceive(receiveState);
+			if (socket != null)
+				socket.BeginReceive(buffer, 0, 1024, SocketFlags.None,
+					receiveState => {
+						var s = (Socket)receiveState.AsyncState;
+						s.EndReceive(receiveState);
 						callback(buffer);
-					} catch (Exception ex) {
-						error(ex);
-					}
-				}, socket);
+					}, socket);
 
 			return this;
+		}
+
+		public static int GetPort(string endpoint) {
+			int port;
+
+			var portString = endpoint.Contains(":") ? endpoint.Split(':')[1] : "11211";
+			if (!int.TryParse(portString, out port))
+				throw new ConfigurationErrorsException("The specified port is not a valid int integer");
+
+			return port;
 		}
 	}
 }

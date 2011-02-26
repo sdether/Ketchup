@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Ketchup.Algorithms {
-	internal class CRC32 {
-		uint[] table;
+	internal class Crc32 {
+		readonly uint[] table;
 		public uint GetUInt(byte[] bytes) {
-			uint crc = 0xffffffff;
-			for (int i = 0; i < bytes.Length; ++i) {
-				byte index = (byte)(((crc) & 0xff) ^ bytes[i]);
-				crc = (uint)((crc >> 8) ^ table[index]);
+			var crc = 0xffffffff;
+			foreach (var t in bytes)
+			{
+				var index = (byte)(((crc) & 0xff) ^ t);
+				crc = (crc >> 8) ^ table[index];
 			}
 			return ~crc;
 		}
@@ -19,15 +17,14 @@ namespace Ketchup.Algorithms {
 			return BitConverter.GetBytes(GetUInt(bytes));
 		}
 
-		public CRC32() {
-			uint poly = 0xedb88320;
+		public Crc32() {
+			const uint poly = 0xedb88320;
 			table = new uint[256];
-			uint temp = 0;
 			for (uint i = 0; i < table.Length; ++i) {
-				temp = i;
-				for (int j = 8; j > 0; --j) {
+				var temp = i;
+				for (var j = 8; j > 0; --j) {
 					if ((temp & 1) == 1) {
-						temp = (uint)((temp >> 1) ^ poly);
+						temp = (temp >> 1) ^ poly;
 					} else {
 						temp >>= 1;
 					}

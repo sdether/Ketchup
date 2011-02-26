@@ -45,6 +45,7 @@
     <Compile Include="Asynchronous\SetExtensions.cs" />
     <Compile Include="Bucket.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
+    <Compile Include="Hashing\IHashingAlgortihm.cs" />
     <Compile Include="Protocol\Key.cs" />
     <Compile Include="Protocol\Operations.cs" />
     <Compile Include="Protocol\Packet.cs" />
@@ -56,7 +57,7 @@
     <Compile Include="KetchupClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Asynchronous\GetExtensions.cs" />
-    <Compile Include="Hashing\Hashing.cs" />
+    <Compile Include="Hashing\Hasher.cs" />
     <Compile Include="Protocol\PacketExtensions.cs" />
     <Compile Include="Protocol\ProtocolExceptions.cs" />
   </ItemGroup>

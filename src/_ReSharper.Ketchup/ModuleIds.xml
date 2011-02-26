@@ -1,0 +1,5 @@
+<Modules>
+  <Module PersistentId="46A72B27-5051-45EC-A651-A8A4A53320F6" ModuleId="Ketchup" />
+  <Module PersistentId="27BBE267-922F-4332-96F9-FDFC39D59907" ModuleId="Ketchup.Demo" />
+  <Module PersistentId="B96E1F34-1D3C-4CD8-8D91-8207111EAE98" ModuleId="Ketchup.Tests" />
+</Modules>

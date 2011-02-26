@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Configuration;
 
 namespace Ketchup.Config {
 	public class KetchupConfigSection : ConfigurationSection {
-
-		private static KetchupConfigSection instance = null;
 		/// <summary>
 		/// Singleton Instance
 		/// </summary>
@@ -52,7 +47,7 @@ namespace Ketchup.Config {
 
 			//buckets;
 			foreach (ConfigBucket cb in ConfigBuckets) {
-				var bucket = new Bucket() {
+				var bucket = new Bucket {
 					Name = cb.Name,
 					Port = cb.Port,
 					Prefix = cb.Prefix
@@ -120,7 +115,7 @@ namespace Ketchup.Config {
 			}
 			set {
 				if (BaseGet(index) != null)
-					base.BaseRemoveAt(index);
+					BaseRemoveAt(index);
 				BaseAdd(index, value);
 			}
 		}
@@ -150,7 +145,7 @@ namespace Ketchup.Config {
 			}
 			set {
 				if (BaseGet(index) != null)
-					base.BaseRemoveAt(index);
+					BaseRemoveAt(index);
 				BaseAdd(index, value);
 			}
 		}
@@ -203,7 +198,7 @@ namespace Ketchup.Config {
 			}
 			set {
 				if (BaseGet(index) != null)
-					base.BaseRemoveAt(index);
+					BaseRemoveAt(index);
 				BaseAdd(index, value);
 			}
 		}

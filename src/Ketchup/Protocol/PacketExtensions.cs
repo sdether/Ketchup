@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
@@ -8,20 +6,27 @@ using System.IO;
 namespace Ketchup.Protocol {
 	public static class PacketExtensions {
 
-		public static void CopyTo(this short value, byte[] destination, int index, int length = 2) {
-			var a = BitConverter.GetBytes(value);
-			Array.Reverse(a);
-			Array.Copy(a, 0, destination, index, length);
+		public static byte[] CopyTo(this short value, byte[] destination, int index, int length = 2) {
+			var source = BitConverter.GetBytes(value);
+			CopyTo(source, length, destination, index);
+			return destination;
 		}
 
-		public static void CopyTo(this int value, byte[] destination, int index, int length = 4) {
-			var a = BitConverter.GetBytes(value);
-			Array.Reverse(a);
-			Array.Copy(a, 0, destination, index, length);
+		public static byte[] CopyTo(this int value, byte[] destination, int index, int length = 4) {
+			var source = BitConverter.GetBytes(value);
+			CopyTo(source, length, destination, index);
+			return destination;
 		}
 
-		public static void CopyTo(this long value, byte[] destination, int index, int length = 8) {
-			var a = BitConverter.GetBytes(value);
+		public static byte[] CopyTo(this long value, byte[] destination, int index, int length = 8) {
+			var source = BitConverter.GetBytes(value);
+			CopyTo(source, length, destination, index);
+			return destination;
+		}
+
+		private static void CopyTo(byte[] source, int length, byte[] destination, int index) {
+			var a = new byte[length];
+			Array.Copy(source, 0, a, 0, length);
 			Array.Reverse(a);
 			Array.Copy(a, 0, destination, index, length);
 		}
@@ -48,7 +53,8 @@ namespace Ketchup.Protocol {
 		}
 
 		public static byte[] GetBytes<T>(this T obj) {
-			if (obj == null) return new byte[0];
+			if (obj == null) 
+				return new byte[0];
 
 			var value = (object)obj;
 			switch (Type.GetTypeCode(typeof(T))) {
@@ -92,7 +98,7 @@ namespace Ketchup.Protocol {
 					return BitConverter.GetBytes((float)value);
 
 				default:
-					using (MemoryStream ms = new MemoryStream()) {
+					using (var ms = new MemoryStream()) {
 						new BinaryFormatter().Serialize(ms, value);
 						return ms.ToArray();
 					}
@@ -158,7 +164,7 @@ namespace Ketchup.Protocol {
 					break;
 
 				default:
-					using (MemoryStream ms = new MemoryStream(bytes)) {
+					using (var ms = new MemoryStream(bytes)) {
 						obj = new BinaryFormatter().Deserialize(ms);
 					}
 					break;

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Ketchup.Protocol {
+﻿namespace Ketchup.Protocol {
 
 	public enum Magic : byte {
 		Request = 0x80,

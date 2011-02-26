@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Configuration;
-using System.Net;
 
 namespace Ketchup {
 	internal class NodeList : List<Node> {
@@ -15,10 +11,10 @@ namespace Ketchup {
 		public Node GetOrCreate(string endpoint) {
 			var host = endpoint.Split(':')[0];
 
-			var port = GetPort(endpoint);
+			var port = Node.GetPort(endpoint);
 			var id = host + ":" + port;
 
-			Node node = GetById(id);
+			var node = GetById(id);
 			if(node != null)
 				return node;
 
@@ -27,14 +23,6 @@ namespace Ketchup {
 			return node;
 		}
 
-		private int GetPort(string endpoint) {
-			int port;
 
-			var portString = endpoint.Contains(":") ? endpoint.Split(':')[1] : "11211";
-			if (!int.TryParse(portString, out port))
-				throw new ConfigurationErrorsException("The specified port is not a valid int integer");
-
-			return port;
-		}
 	}
 }

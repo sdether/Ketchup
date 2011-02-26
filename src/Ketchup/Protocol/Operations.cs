@@ -1,27 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Ketchup.Config;
-using Ketchup.Protocol;
+using Ketchup.Hashing;
 
 namespace Ketchup.Protocol {
 	internal static class Operations {
-		private static KetchupConfig config = KetchupConfig.Current;
-		
-		internal static void Get<T>(Op operation,string key,string bucket,Action<T> hit,Action miss,Action<Exception> error) {
+		private static readonly KetchupConfig config = KetchupConfig.Current;
+
+		internal static void Get<T>(Op operation, string key, string bucket, Action<T> hit, Action miss, Action<Exception> error) {
 			key = config.GetKey(key, bucket);
-			var packet = new Packet<T>().Operation(operation).Key(key);
-			var node = Hashing.GetNode(key, bucket).Request(packet.Serialize(),
-				rb => { hit(packet.Deserialize(rb)); },
-				ex => {
-					if (ex is Protocol.NotFoundException) {
-						miss();
-					} else {
-						error(ex);
+			var packet = new Packet<T>(operation, key);
+			Hasher.GetNode(key, bucket).Request(packet.Serialize(),
+				rb => {
+					try {
+						hit(packet.Deserialize(rb));
+					} catch (Exception ex) {
+						if (ex is NotFoundException) {
+							miss();
+						} else {
+							error(ex);
+						}
+
 					}
-				}
-			);
+				});
 		}
 
 		internal static void Set<T>(Op operation, string key, T value, int expiration, string bucket, Action success, Action<Exception> error) {
@@ -30,10 +30,16 @@ namespace Ketchup.Protocol {
 			expiration.CopyTo(extras, 4);
 
 			key = config.GetKey(key, bucket);
-			var packet = new Packet<T>(operation).Key(key).Extras(extras).Value(value);
-			var node = Hashing.GetNode(key, bucket).Request(packet.Serialize(),
-				rb => { success(); },
-				ex => { error(ex); }
+			var packet = new Packet<T>(operation, key).Extras(extras).Value(value);
+			Hasher.GetNode(key, bucket).Request(packet.Serialize(),
+				rb => {
+					try {
+						packet.Deserialize(rb);
+						success();
+					} catch (Exception ex) {
+						error(ex);
+					}
+				}
 			);
 		}
 	}

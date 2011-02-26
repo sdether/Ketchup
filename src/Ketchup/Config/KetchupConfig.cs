@@ -1,28 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
 using System.Configuration;
-using Ketchup;
 
 namespace Ketchup.Config {
 	public class KetchupConfig {
-		private NodeList nodes = null;
-		private IDictionary<string, IList<Node>> bucketNodes = null;
-		private IDictionary<string, Bucket> buckets = new Dictionary<string,Bucket>();
-		private IList<string> configNodes = new List<string>();
+		private NodeList nodes;
+		private IDictionary<string, IList<Node>> bucketNodes;
+		private static KetchupConfig current;
+		private readonly IDictionary<string, Bucket> buckets = new Dictionary<string, Bucket>();
+		private readonly IList<string> configNodes = new List<string>();
 
-		private static KetchupConfig current = null;
 		public static KetchupConfig Current {
-			get {
+			get
+			{
 				if (current == null && KetchupConfigSection.Current == null)
 					throw new ConfigurationErrorsException("Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file." );
 
-				if (current == null)
-					current = KetchupConfigSection.Current.ToKetchupConfig().Init();
-
-				return current;
+				return current ?? (current = KetchupConfigSection.Current.ToKetchupConfig().Init());
 			}
 		}
 
@@ -76,12 +70,11 @@ namespace Ketchup.Config {
 		}
 
 		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true) {
-			AddBucket(new Bucket() {
+			return AddBucket(new Bucket {
 				Name = name,
 				Port = port,
 				Prefix = prefix
 			});
-			return this;
 		}
 
 		public KetchupConfig AddBucket(Bucket bucket) {
@@ -104,7 +97,7 @@ namespace Ketchup.Config {
 		}
 
 		public static KetchupConfig Init(KetchupConfig config) {
-			current = config.Init();
+			config.Init();
 			return config;
 		}
 
