@@ -52,6 +52,12 @@ namespace Ketchup.Protocol {
 			return BitConverter.ToInt64(a, 0);
 		}
 
+		public static byte[] Reverse(this byte[] bytes)
+		{
+			Array.Reverse(bytes);
+			return bytes;
+		}
+
 		public static byte[] GetBytes<T>(this T obj) {
 			if (obj == null) 
 				return new byte[0];
@@ -65,37 +71,37 @@ namespace Ketchup.Protocol {
 					return Encoding.UTF8.GetBytes((string)value);
 
 				case TypeCode.Boolean:
-					return BitConverter.GetBytes((bool)value);
+					return BitConverter.GetBytes((bool)value).Reverse();
 
 				case TypeCode.Int16:
-					return BitConverter.GetBytes((short)value);
+					return BitConverter.GetBytes((short)value).Reverse(); 
 
 				case TypeCode.Int32:
-					return BitConverter.GetBytes((int)value);
+					return BitConverter.GetBytes((int)value).Reverse();
 
 				case TypeCode.Int64:
-					return BitConverter.GetBytes((long)value);
+					return BitConverter.GetBytes((long)value).Reverse();
 
 				case TypeCode.UInt16:
-					return BitConverter.GetBytes((ushort)value);
+					return BitConverter.GetBytes((ushort)value).Reverse();
 
 				case TypeCode.UInt32:
-					return BitConverter.GetBytes((uint)value);
+					return BitConverter.GetBytes((uint)value).Reverse();
 
 				case TypeCode.UInt64:
-					return BitConverter.GetBytes((ulong)value);
+					return BitConverter.GetBytes((ulong)value).Reverse();
 
 				case TypeCode.Char:
-					return BitConverter.GetBytes((char)value);
+					return BitConverter.GetBytes((char)value).Reverse();
 
 				case TypeCode.DateTime:
 					return BitConverter.GetBytes(((DateTime)value).ToBinary());
 
 				case TypeCode.Double:
-					return BitConverter.GetBytes((double)value);
+					return BitConverter.GetBytes((double)value).Reverse();
 
 				case TypeCode.Single:
-					return BitConverter.GetBytes((float)value);
+					return BitConverter.GetBytes((float)value).Reverse();
 
 				default:
 					using (var ms = new MemoryStream()) {
@@ -124,31 +130,31 @@ namespace Ketchup.Protocol {
 					break;
 
 				case TypeCode.Int16:
-					obj = BitConverter.ToInt16(bytes, 0);
+					obj = BitConverter.ToInt16(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.Int32:
-					obj = BitConverter.ToInt32(bytes, 0);
+					obj = BitConverter.ToInt32(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.Int64:
-					obj = BitConverter.ToInt64(bytes, 0);
+					obj = BitConverter.ToInt64(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.UInt16:
-					obj = BitConverter.ToUInt16(bytes, 0);
+					obj = BitConverter.ToUInt16(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.UInt32:
-					obj = BitConverter.ToUInt32(bytes, 0);
+					obj = BitConverter.ToUInt32(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.UInt64:
-					obj = BitConverter.ToUInt64(bytes, 0);
+					obj = BitConverter.ToUInt64(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.Char:
-					obj = BitConverter.ToChar(bytes, 0);
+					obj = BitConverter.ToChar(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.DateTime:
@@ -156,11 +162,11 @@ namespace Ketchup.Protocol {
 					break;
 
 				case TypeCode.Double:
-					obj = BitConverter.ToDouble(bytes, 0);
+					obj = BitConverter.ToDouble(bytes.Reverse(), 0);
 					break;
 
 				case TypeCode.Single:
-					obj = BitConverter.ToSingle(bytes, 0);
+					obj = BitConverter.ToSingle(bytes.Reverse(), 0);
 					break;
 
 				default:

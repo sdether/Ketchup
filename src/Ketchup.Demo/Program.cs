@@ -1,5 +1,5 @@
 ﻿using System;
-using Ketchup.Asynchronous;
+using Ketchup.Async;
 using Ketchup.Config;
 
 namespace Ketchup.Demo {

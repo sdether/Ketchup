@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Ketchup.Protocol.Exceptions;
+using NotSupportedException = System.NotSupportedException;
+using OutOfMemoryException = System.OutOfMemoryException;
 
 namespace Ketchup.Protocol {
 	internal class Packet<T> {
 		private const short headerl = 24;
 		private readonly byte[] headerb = new byte[24];
+		private bool hasval = false;
 		private byte[] extrasb = new byte[0];
 		private byte[] keyb = new byte[0];
 		private byte[] valb;
+		
 		private T valueT;
 
 		public Packet() {
@@ -121,12 +126,20 @@ namespace Ketchup.Protocol {
 
 		public Packet<T> Value(T value) {
 			valueT = value;
+			hasval = true;
 			return this;
 		}
 
 		public Packet<T> Value(byte[] returnb, int index, int length) {
 			valb = new byte[length];
 			Array.Copy(returnb, index, valb, 0, length);
+			hasval = true;
+			return this;
+		}
+
+		public Packet<T> Value(bool hasValue) {
+			//some memcached protocol commands like incr MUST have no value, not even a 0, problematic for value-types;
+			hasval = hasValue;
 			return this;
 		}
 
@@ -176,9 +189,9 @@ namespace Ketchup.Protocol {
 				case Response.KeyExists:
 					throw new KeyExistsException(key, op, vals);
 				case Response.NotSupported:
-					throw new NotSupportedException(key, op, vals);
+					throw new OperationNotSupportedException(key, op, vals);
 				case Response.OutOfMemory:
-					throw new OutOfMemoryException(key, op, vals);
+					throw new ServerOutOfMemoryException(key, op, vals);
 				case Response.TemporaryFailure:
 					throw new TemporaryFailureException(key, op, vals);
 				case Response.UnknownCommand:
@@ -196,7 +209,7 @@ namespace Ketchup.Protocol {
 		}
 
 		public byte[] Serialize() {
-			var valueb = valueT.GetBytes();
+			var valueb = hasval ? valueT.GetBytes() : new byte[0];
 			TotalLength(extrasb.Length + keyb.Length + valueb.Length);
 
 			var result = new List<byte>();

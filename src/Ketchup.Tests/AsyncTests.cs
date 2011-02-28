@@ -1,24 +1,28 @@
 ﻿using System;
-using Ketchup.Protocol;
 using Xunit;
-using Ketchup.Asynchronous;
-using Ketchup.Config;
 using System.Threading;
+using Ketchup.Async;
+using Ketchup.Config;
+using Ketchup.Protocol.Exceptions;
 
 namespace Ketchup.Tests {
 	public class AsyncTests {
+
+		private const string key = "hello";
+		private const string stringValue = "world!";
+		private const long longValue = 1;
+		private readonly byte[] byteValue = new byte[2000000];
 
 		[Fact]
 		public string SetWithSuccess() {
 			//have to do this for async operations in unit test framework
 			var block = true;
 			Exception exb = null;
-			const string value = "world!";
 			var cli = new KetchupClient(BuildConfiguration(), "default");
 
 			cli.Set(
-				"hello",
-				value,
+				key,
+				stringValue,
 				() => {
 					block = false;
 					Assert.True(true);
@@ -39,7 +43,38 @@ namespace Ketchup.Tests {
 			if (exb != null)
 				throw exb;
 
-			return value;
+			return stringValue;
+		}
+
+		[Fact]
+		public long SetLongWithSuccess() {
+			//have to do this for async operations in unit test framework
+			Exception exb = null;
+			var block = true;
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+
+			cli.Set(key,longValue,
+				() => {
+					block = false;
+					Assert.True(true);
+				},
+				ex => {
+					block = false;
+					exb = ex;
+					throw ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 100) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			return longValue;
 		}
 
 		[Fact]
@@ -50,14 +85,9 @@ namespace Ketchup.Tests {
 			ProtocolException exp = null;
 
 			//I should get value too large
-
-			var value = new byte[2000000];
-
 			var cli = new KetchupClient(BuildConfiguration(), "default");
 
-			cli.Set(
-				"giant byte",
-				value,
+			cli.Set(key,byteValue,
 				() => {
 					block = false;
 					exb = new Exception("Success was fired, but should be exception");
@@ -83,21 +113,124 @@ namespace Ketchup.Tests {
 		}
 
 		[Fact]
+		public void ReplaceWithException() {
+			//have to do this for async operations in unit test framework
+			var block = true;
+			Exception exb = null;
+			ProtocolException exp = null;
+
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+			cli.Replace(new Random().Next().ToString(),stringValue,
+				() => {
+					block = false;
+					exb = new Exception("Success was fired, but should be exception");
+				},
+				ex => {
+					block = false;
+					exp = ex as NotFoundException;
+					if (exp == null)
+						exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 100) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.NotNull(exp);
+		}
+
+		[Fact]
+		public void AddWithException() {
+			//have to do this for async operations in unit test framework
+			var block = true;
+			Exception exb = null;
+			ProtocolException exp = null;
+
+			var value = SetWithSuccess();
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+
+			cli.Add(key, value,
+				() => {
+					block = false;
+					exb = new Exception("Success was fired, but should be exception");
+				},
+				ex => {
+					block = false;
+					exp = ex as KeyExistsException;
+					if (exp == null)
+						exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 100) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.NotNull(exp);
+		}
+
+		[Fact]
 		public void SetWithExpirationTest() {
 
 		}
 
 		[Fact]
-		public void GetWithHit() {
+		public long GetLong() {
+			var block = true;
+			Exception exb = null;
+			long returnValue = 1;
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+			cli.Get<long>(key,
+				//hit
+				val => {
+					block = false;
+					returnValue = val;
+				},
+				//miss
+				() => {
+					block = false;
+					exb = new Exception("A miss was fired");
+				},
+				//error
+				ex => {
+					block = false;
+					exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.Equal(longValue, returnValue);
+			return returnValue;
+		}
+
+		[Fact]
+		public string GetWithHit() {
 			var block = true;
 			Exception exb = null;
 			var returnValue = "";
 
 			var value = SetWithSuccess();
-
 			var cli = new KetchupClient(BuildConfiguration(), "default");
-			cli.Get<string>(
-				"hello",
+			cli.Get<string>(key,
 				//hit
 				val => {
 					block = false;
@@ -126,16 +259,56 @@ namespace Ketchup.Tests {
 				throw exb;
 
 			Assert.Equal(value, returnValue);
+			return returnValue;
 		}
+
+		[Fact]
+		public int GetIntWithHit() {
+			var block = true;
+			Exception exb = null;
+			var value = SetLongWithSuccess();
+			var returnValue = -1;
+
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+			cli.Get<int>(key,
+				//hit
+				val => {
+					block = false;
+					returnValue = val;
+				},
+				//miss
+				() => {
+					block = false;
+					exb = new Exception("A miss was fired");
+				},
+				//error
+				ex => {
+					block = false;
+					exb = ex;
+					throw ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.Equal(value, returnValue);
+			return returnValue;
+		}
+
 
 		[Fact]
 		public static void GetWithMiss() {
 			var block = true;
 			Exception exb = null;
-
 			var cli = new KetchupClient(BuildConfiguration(), "default");
-			cli.Get<string>(
-				new Random().Next().ToString(),
+			cli.Get<string>(new Random().Next().ToString(),
 				//hit
 				val => {
 					block = false;
@@ -161,6 +334,146 @@ namespace Ketchup.Tests {
 
 			if (exb != null)
 				throw exb;
+		}
+
+		[Fact]
+		public void DeleteWithSuccess() {
+			Exception exb = null;
+			var block = true;
+			var value = SetWithSuccess();
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+			cli.Delete(key,
+				//success
+				() => {
+					block = false;
+					value = "got here";
+				},
+				//error
+				ex => {
+					block = false;
+					exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.Equal(value, "got here");
+		}
+
+		[Fact]
+		public void DeleteWithException() {
+			//have to do this for async operations in unit test framework
+			var block = true;
+			Exception exb = null;
+			ProtocolException exp = null;
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+
+			cli.Delete(new Random().Next().ToString(),
+				() => {
+					block = false;
+					exb = new Exception("Success was fired, but should be exception");
+				},
+				ex => {
+					block = false;
+					exp = ex as NotFoundException;
+					if (exp == null)
+						exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 100) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.NotNull(exp);
+		}
+
+		[Fact]
+		public void IncrWithInitialExpiration() {
+			Exception exb = null;
+			const long step = 1;
+			long returnValue = 0;
+			var block = true;
+			//var value = SetLongWithSuccess();
+			DeleteWithSuccess();
+			//var value = 1;
+			var incrValue = longValue + step;
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+
+			cli.IncrDecr(key,step,incrValue,new TimeSpan(0,0,30), 
+				//success
+				ul => {
+					block = false;
+					returnValue = (long)ul;
+				},
+				//error
+				ex => {
+					block = false;
+					exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			Assert.Equal(returnValue, incrValue);
+		}
+
+		[Fact]
+		public void IncrWithSuccess() {
+			Exception exb = null;
+			const long step = 1;
+			long returnValue = 0;
+			var block = true;
+			IncrWithInitialExpiration();
+			var incrValue = longValue + step;
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+
+			cli.IncrDecr(key, step,
+				//success
+				ul => {
+					block = false;
+				},
+				//error
+				ex => {
+					block = false;
+					exb = ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			returnValue = GetLong();
+			Assert.Equal(incrValue, returnValue);
+		}
+
+		[Fact]
+		public void IncrWithException() {
 		}
 
 		private static KetchupConfig BuildConfiguration() {
