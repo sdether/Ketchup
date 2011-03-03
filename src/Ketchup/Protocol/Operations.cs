@@ -30,16 +30,23 @@ namespace Ketchup.Protocol {
 
 			key = config.GetKey(key, bucket);
 			var packet = new Packet<T>(operation, key).Extras(extras).Value(value);
-			Hasher.GetNode(key, bucket).Request(packet.Serialize(),
-				rb => {
-					try {
-						packet.Deserialize(rb);
-						success();
-					} catch (Exception ex) {
-						error(ex);
+
+			if(success != null && error != null) {
+				Hasher.GetNode(key, bucket).Request(packet.Serialize(),
+					rb => {
+						try {
+							packet.Deserialize(rb);
+							success();
+						} catch (Exception ex) {
+							error(ex);
+						}
 					}
-				}
-			);
+				);
+			}
+			else {
+				//shh...
+				Hasher.GetNode(key, bucket).Request(packet.Serialize(), null);
+			}
 		}
 
 		public static void Delete(Op operation, string key, string bucket, Action success, Action<Exception> error) {

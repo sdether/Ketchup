@@ -92,7 +92,7 @@ namespace Ketchup.Protocol {
 					return BitConverter.GetBytes((ulong)value).Reverse();
 
 				case TypeCode.Char:
-					return BitConverter.GetBytes((char)value).Reverse();
+					return BitConverter.GetBytes((char)value);
 
 				case TypeCode.DateTime:
 					return BitConverter.GetBytes(((DateTime)value).ToBinary());

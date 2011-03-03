@@ -105,7 +105,7 @@ namespace Ketchup {
 					},socket);
 
 			var buffer = new byte[1024];
-			if (socket != null)
+			if (socket != null && callback != null)
 				socket.BeginReceive(buffer, 0, 1024, SocketFlags.None,
 					receiveState => {
 						var s = (Socket)receiveState.AsyncState;

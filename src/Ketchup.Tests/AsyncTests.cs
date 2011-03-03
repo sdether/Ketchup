@@ -10,8 +10,10 @@ namespace Ketchup.Tests {
 
 		private const string key = "hello";
 		private const string stringValue = "world!";
+		private const string numValue = "20";
 		private const long longValue = 1;
 		private readonly byte[] byteValue = new byte[2000000];
+
 
 		[Fact]
 		public string SetWithSuccess() {
@@ -76,6 +78,38 @@ namespace Ketchup.Tests {
 
 			return longValue;
 		}
+
+		[Fact]
+		public string SetNumericWithSuccess() {
+			//have to do this for async operations in unit test framework
+			Exception exb = null;
+			var block = true;
+			var cli = new KetchupClient(BuildConfiguration(), "default");
+
+			cli.Set(key, numValue,
+				() => {
+					block = false;
+					Assert.True(true);
+				},
+				ex => {
+					block = false;
+					exb = ex;
+					throw ex;
+				});
+
+			//have to block to wait for the async op to complete, otherwise method returns pass;
+			var counter = 0;
+			while (block) {
+				if (++counter == 100) throw new TimeoutException("Operation has timed out with no response");
+				Thread.Sleep(500);
+			}
+
+			if (exb != null)
+				throw exb;
+
+			return numValue;
+		}
+
 
 		[Fact]
 		public void SetWithException() {
@@ -400,57 +434,56 @@ namespace Ketchup.Tests {
 			Assert.NotNull(exp);
 		}
 
-		[Fact]
-		public void IncrWithInitialExpiration() {
-			Exception exb = null;
-			const long step = 1;
-			long returnValue = 0;
-			var block = true;
-			//var value = SetLongWithSuccess();
-			DeleteWithSuccess();
-			//var value = 1;
-			var incrValue = longValue + step;
-			var cli = new KetchupClient(BuildConfiguration(), "default");
+		//[Fact]
+		//public void IncrWithInitialExpiration() {
+		//    Exception exb = null;
+		//    const long step = 1;
+		//    var returnValue = '0';
+		//    var block = true;
+		//    var value = SetCharWithSuccess();
+		//    var incrValue = longValue + step;
+		//    var cli = new KetchupClient(BuildConfiguration(), "default");
 
-			cli.IncrDecr(key,step,incrValue,new TimeSpan(0,0,30), 
-				//success
-				ul => {
-					block = false;
-					returnValue = (long)ul;
-				},
-				//error
-				ex => {
-					block = false;
-					exb = ex;
-				});
+		//    cli.IncrDecr(key,step,
+		//        //success
+		//        ul => {
+		//            block = false;
+		//            returnValue = ch;
+		//        },
+		//        //error
+		//        ex => {
+		//            block = false;
+		//            exb = ex;
+		//        });
 
-			//have to block to wait for the async op to complete, otherwise method returns pass;
-			var counter = 0;
-			while (block) {
-				if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
-				Thread.Sleep(500);
-			}
+		//    //have to block to wait for the async op to complete, otherwise method returns pass;
+		//    var counter = 0;
+		//    while (block) {
+		//        if (++counter == 6) throw new TimeoutException("Operation has timed out with no response");
+		//        Thread.Sleep(500);
+		//    }
 
-			if (exb != null)
-				throw exb;
+		//    if (exb != null)
+		//        throw exb;
 
-			Assert.Equal(returnValue, incrValue);
-		}
+		//    Assert.Equal(returnValue, Convert.ToChar(incrValue));
+		//}
 
 		[Fact]
 		public void IncrWithSuccess() {
 			Exception exb = null;
-			const long step = 1;
-			long returnValue = 0;
+			const long step = 100;
+			ulong returnValue = 0;
 			var block = true;
-			IncrWithInitialExpiration();
-			var incrValue = longValue + step;
+			var iv = ulong.Parse(SetNumericWithSuccess());
+			var incrValue = iv + step;
 			var cli = new KetchupClient(BuildConfiguration(), "default");
 
 			cli.IncrDecr(key, step,
 				//success
 				ul => {
 					block = false;
+					returnValue = ul;
 				},
 				//error
 				ex => {
@@ -468,7 +501,6 @@ namespace Ketchup.Tests {
 			if (exb != null)
 				throw exb;
 
-			returnValue = GetLong();
 			Assert.Equal(incrValue, returnValue);
 		}
 
