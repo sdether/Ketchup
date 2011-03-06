@@ -126,14 +126,35 @@ namespace Ketchup.Tests {
 		public void IncrWithSuccess() {
 			DeleteWithSuccess();
 			TestAsync((success, fail) => {
-				//first set increment with initial value and increment by one to get the result value
+				//first set intial value, step and expected result
 				long initial = 20;
 				long step = 8;
 				var result = initial + step;
+				//call incrdecr first to set initial value, there's no step yet
 				cli.IncrDecr(key: key, initial: initial, expiration: new TimeSpan(1, 0, 0), success: v => {
 					Assert.Equal(initial, v);
 				}, error: fail)
-				//now call incr/decr again with a 0 step to see if the value is still the same
+				//now call incr/decr again with an 8 step to ensure you get teh final result back.
+				.IncrDecr(key: key, step: step, success: v1 => {
+					Assert.Equal(result, v1);
+					success();
+				}, error: fail);
+			});
+		}
+
+		[Fact]
+		public void IncrWithNegative() {
+			DeleteWithSuccess();
+			TestAsync((success, fail) => {
+				//first set intial value, step and expected result
+				long initial = 20;
+				long step = -8;
+				var result = initial + step;
+				//call incrdecr first to set initial value, there's no step yet
+				cli.IncrDecr(key: key, initial: initial, expiration: new TimeSpan(1, 0, 0), success: v => {
+					Assert.Equal(initial, v);
+				}, error: fail)
+				//now call incr/decr again with an 8 step to ensure you get teh final result back.
 				.IncrDecr(key: key, step: step, success: v1 => {
 					Assert.Equal(result, v1);
 					success();
@@ -145,7 +166,6 @@ namespace Ketchup.Tests {
 		public void IncrWithException() {
 			SetWithSuccess();
 			TestAsync((success, fail) => {
-				//first set increment with non-numeric and increment by one to get error
 				cli.IncrDecr(key: key, step: 8, success: v1 =>
  					fail(new Exception("operation succeeded, but failure expected")),
 					error:ex => {

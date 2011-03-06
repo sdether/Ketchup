@@ -7,7 +7,10 @@ namespace Ketchup.Async {
 
 		public static KetchupClient IncrDecr(this KetchupClient client, 
 			string key, long step, Action<long> success, Action<Exception> error) {
-				Operations.IncrDecr(Op.Incr, key, 0, step, 0, client.Bucket, success, error);
+
+			var op = step < 0 ? Op.Decr : Op.Incr;
+			step = Math.Abs(step);
+			Operations.IncrDecr(op, key, 0, step, 0, client.Bucket, success, error);
 
 			return client;
 		}
