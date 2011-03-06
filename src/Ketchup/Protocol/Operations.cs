@@ -62,12 +62,12 @@ namespace Ketchup.Protocol {
 				});
 		}
 
-		public static void IncrDecr(Op operation, string key, long step, long initial, int expiration, string bucket, Action<ulong> success, Action<Exception> error) {
+		public static void IncrDecr(Op operation, string key, long initial, long step, int expiration, string bucket, Action<long> success, Action<Exception> error) {
 			var extras = new byte[20];
 			step.CopyTo(extras, 0);
 			initial.CopyTo(extras, 8);
 			expiration.CopyTo(extras, 16);
-			var packet = new Packet<ulong>(operation, config.GetKey(key, bucket)).Extras(extras);
+			var packet = new Packet<long>(operation, config.GetKey(key, bucket)).Extras(extras);
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(),
 				rb => {
 					try {
