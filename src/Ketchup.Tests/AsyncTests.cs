@@ -161,31 +161,36 @@ namespace Ketchup.Tests {
 		public void DeleteWithException() {
 			TestHelpers.TestAsync((success, fail) =>
 				cli.Delete(new Random().Next().ToString(),
-					() => fail(new Exception("Success was fired, but should be exception")),
-					ex => {
-						if (ex is NotFoundException)
-							success();
-						else
-							fail(ex);
-					})
+					success:() => fail(new Exception("Success was fired, but should be exception")),
+					error:ex => { if (ex is NotFoundException) success(); else fail(ex); }
+				)
 			);
 		}
 
 		[Fact]
 		public void IncrWithSuccess() {
+			//first set intial value, step and expected result
 			var key = "incr-success";
+			long initial = 20;
+			long step = 8;
+			var result = initial + step;
 
 			TestHelpers.TestAsync((success, fail) => {
-				//first set intial value, step and expected result
-				long initial = 20;
-				long step = 8;
-				var result = initial + step;
+				//we don't actually care if it succeeds or fails, just go quietly
+				cli.Delete(key, success, ex => success());
+			});
+
+			TestHelpers.TestAsync((success, fail) => {
 				//call incrdecr first to set initial value, there's no step yet
 				cli.IncrDecr(key: key, initial: initial, expiration: new TimeSpan(1, 0, 0), success: v => {
 					Assert.Equal(initial, v);
-				}, error: fail)
+					success();
+				}, error: fail);
+			});
+
+			TestHelpers.TestAsync((success, fail) => {
 				//now call incr/decr again with an 8 step to ensure you get the final result back.
-				.IncrDecr(key: key, step: step, success: v1 => {
+				cli.IncrDecr(key: key, step: step, success: v1 => {
 					Assert.Equal(result, v1);
 					success();
 				}, error: fail);
@@ -194,38 +199,48 @@ namespace Ketchup.Tests {
 
 		[Fact]
 		public void DecrWithSuccess() {
+			//first set intial value, step and expected result
 			var key = "decr-success";
+			long initial = 20;
+			long step = -8;
+			var result = initial + step;
 
 			TestHelpers.TestAsync((success, fail) => {
-				//first set intial value, step and expected result
-				long initial = 20;
-				long step = -8;
-				var result = initial + step;
+				//we don't actually care if it succeeds or fails, just go quietly
+				cli.Delete(key, success, ex => success());
+			});
+
+			TestHelpers.TestAsync((success, fail) => {
 				//call incrdecr first to set initial value, there's no step yet
 				cli.IncrDecr(key: key, initial: initial, expiration: new TimeSpan(1, 0, 0), success: v => {
 					Assert.Equal(initial, v);
-				}, error: fail)
-				//now call incr/decr again with an 8 step to ensure you get teh final result back.
-				.IncrDecr(key: key, step: step, success: v1 => {
+					success();
+				}, error: fail);
+			});
+
+			TestHelpers.TestAsync((success, fail) => {
+				//now call incr/decr again with an 8 step to ensure you get the final result back.
+				cli.IncrDecr(key: key, step: step, success: v1 => {
 					Assert.Equal(result, v1);
 					success();
 				}, error: fail);
 			});
+
 		}
 
 		[Fact]
 		public void IncrWithException() {
 			var key = "incr-exception";
+			var value = 5;
 
 			TestHelpers.TestAsync((success, fail) => {
-				cli.IncrDecr(key: key, step: 8, success: v1 =>
- 					fail(new Exception("operation succeeded, but failure expected")),
-					error:ex => {
-						if (ex is IncrDecrNonNumericException)
-							success();
-						else
-							fail(ex);
-					});
+				cli.Set(key, value, success, ex => success());
+			});
+
+			TestHelpers.TestAsync((success, fail) => {
+				cli.IncrDecr(key: key, step: 8, 
+					success: v1 => fail(new Exception("operation succeeded, but failure expected")),
+					error:ex => { if (ex is IncrDecrNonNumericException) success(); else fail(ex); });
 				});
 		}
 

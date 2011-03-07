@@ -12,7 +12,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<T>(operation, config.GetKey(key, bucket));
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 					try {
-						hit(packet.Deserialize(rb));
+						hit(new Packet<T>().Deserialize(rb));
 					} catch (Exception ex) {
 						if (ex is NotFoundException) {
 							miss();
@@ -34,7 +34,7 @@ namespace Ketchup.Protocol {
 			if(success != null && error != null) {
 				Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 						try {
-							packet.Deserialize(rb);
+							new Packet<T>().Deserialize(rb);
 							success();
 						} catch (Exception ex) {
 							error(ex);
@@ -51,13 +51,13 @@ namespace Ketchup.Protocol {
 		public static void Delete(Op operation, string key, string bucket, Action success, Action<Exception> error) {
 			var packet = new Packet<string>(operation, config.GetKey(key, bucket));
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(),rb => {
-					try {
-						packet.Deserialize(rb);
-						success();
-					} catch (Exception ex) {
-						error(ex);
-					}
-				});
+				try {
+					new Packet<string>().Deserialize(rb);
+					success();
+				} catch (Exception ex) {
+					error(ex);
+				}
+			});
 		}
 
 		public static void IncrDecr(Op operation, string key, long initial, long step, int expiration, string bucket, Action<long> success, Action<Exception> error) {
@@ -68,24 +68,26 @@ namespace Ketchup.Protocol {
 
 			var packet = new Packet<long>(operation, config.GetKey(key, bucket)).Extras(extras);
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
-					try {
-						success(packet.Deserialize(rb));
-					} 
-					catch (Exception ex) {
-						error(ex);
-					}
-				});
+				try {
+					success(new Packet<long>().Deserialize(rb));
+				} catch (Exception ex) {
+					error(ex);
+				}
+			});
 		}
 
 		/// <summary>
 		/// Quit assumes success unless an error is thrown
 		/// </summary>
+		/// <param name="success"></param>
 		/// <param name="error"></param>
+		/// <param name="operation"></param>
+		/// <param name="node"></param>
 		public static void QuitNoOp(Op operation, Node node, Action success, Action<Exception> error) {
 			var packet = new Packet<string>(operation, "");
 			node.Request(packet.Serialize(), rb => {
 				try {
-					packet.Deserialize(rb);
+					new Packet<string>().Deserialize(rb);
 					success();
 				} catch (Exception ex) {
 					error(ex);
@@ -100,7 +102,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<string>(operation, "").Extras(extras);
 			node.Request(packet.Serialize(), rb => {
 				try {
-					packet.Deserialize(rb);
+					new Packet<string>().Deserialize(rb);
 					success();
 				} catch (Exception ex) {
 					error(ex);
@@ -112,21 +114,21 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<string>(operation, "");
 			node.Request(packet.Serialize(), rb => {
 				try {
-					success(packet.Deserialize(rb));
+					success(new Packet<string>().Deserialize(rb));
 				} catch (Exception ex) {
 					error(ex);
 				}
 			});
 		}
 
-		public static void AppendPrepend<T>(Op operation, string key, T value, string bucket, Action success, Action<Exception> error) {
+		public static void AppendPrepend(Op operation, string key, string value, string bucket, Action success, Action<Exception> error) {
 			key = config.GetKey(key, bucket);
-			var packet = new Packet<T>(operation, key).Value(value);
+			var packet = new Packet<string>(operation, key).Value(value);
 
 			if (success != null && error != null) {
 				Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 					try {
-						packet.Deserialize(rb);
+						new Packet<string>().Deserialize(rb);
 						success();
 					} catch (Exception ex) {
 						error(ex);
@@ -144,7 +146,7 @@ namespace Ketchup.Protocol {
 			node = string.IsNullOrEmpty(key) ? node : Hasher.GetNode(key, bucket);
 			node.Request(packet.Serialize(), rb => {
 				try {
-					string value = packet.Deserialize(rb);
+					var value = new Packet<string>().Deserialize(rb);
 					packet.Key(out key);
 					if (key == "" && value == "")
 						complete();
