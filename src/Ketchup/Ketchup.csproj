@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\CRC32.cs" />
+    <Compile Include="Async\AppendPrependExtensions.cs" />
+    <Compile Include="Async\FlushExtensions.cs" />
     <Compile Include="Async\IncrDecrExtensions.cs" />
     <Compile Include="Async\DeleteExtensions.cs" />
     <Compile Include="Async\SetAddReplaceExtensions.cs" />

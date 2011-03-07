@@ -88,6 +88,10 @@ namespace Ketchup.Config {
 			return this;
 		}
 
+		public Node GetNode(string address) {
+			return nodes.GetById(address);
+		}
+
 		public IList<Node> GetNodes(string bucket) {
 			return bucketNodes[bucket];
 		}

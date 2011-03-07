@@ -39,7 +39,7 @@ namespace Ketchup.Async {
 		}
 
 		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, DateTime expiration, Action success = null, Action<Exception> error = null) {
-			var exp = (expiration - new DateTime(1970, 1, 1)).Seconds;
+			var exp = expiration == DateTime.MinValue ? 0 : (expiration - new DateTime(1970, 1, 1)).Seconds;
 			Operations.SetAddReplace(Op.Set, key, value, exp, client.Bucket, success, error);
 			return client;
 		}
@@ -58,7 +58,7 @@ namespace Ketchup.Async {
 		}
 
 		public static KetchupClient Add<T>(this KetchupClient client, string key, T value, DateTime expiration, Action success = null, Action<Exception> error = null) {
-			var exp = (expiration - new DateTime(1970, 1, 1)).Seconds;
+			var exp = expiration == DateTime.MinValue ? 0 : (expiration - new DateTime(1970, 1, 1)).Seconds;
 			Operations.SetAddReplace(Op.Add, key, value, exp, client.Bucket, success, error);
 			return client;
 		}
@@ -77,7 +77,7 @@ namespace Ketchup.Async {
 		}
 
 		public static KetchupClient Replace<T>(this KetchupClient client, string key, T value, DateTime expiration, Action success = null, Action<Exception> error = null) {
-			var exp = (expiration - new DateTime(1970, 1, 1)).Seconds;
+			var exp = expiration == DateTime.MinValue ? 0 : (expiration - new DateTime(1970, 1, 1)).Seconds;
 			Operations.SetAddReplace(Op.Replace, key, value, exp, client.Bucket, success, error);
 			return client;
 		}
