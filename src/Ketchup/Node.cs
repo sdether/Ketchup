@@ -5,7 +5,7 @@ using Ketchup.Config;
 
 namespace Ketchup {
 	public class Node {
-		private Socket socket;
+		//private Socket socket;
 
 		public int		Port					{ get; set; }
 		public int		CurrentRetryCount		{ get; set; }
@@ -31,9 +31,9 @@ namespace Ketchup {
 			Port = port;
 		}
 
-		public bool Connect() {
+		public Socket Connect() {
 			var config = KetchupConfig.Current;
-			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			//TODO determine if nodelay from enyim actually makes a difference
 			//socket.NoDelay = true;
 
@@ -56,13 +56,13 @@ namespace Ketchup {
 			} catch (SocketException ex) {
 				switch (ex.SocketErrorCode) {
 					case SocketError.TimedOut:
-						return HandleTimeout();
+						return HandleTimeout(socket);
 					default:
 						throw;
 				}
 			}
 
-			return true;
+			return socket;
 		}
 
 		private bool ReadyToTry() {
@@ -73,7 +73,7 @@ namespace Ketchup {
 			return (DateTime.Now - LastConnectionFailure) >= config.ConnectionRetryDelay;
 		}
 
-		private bool HandleTimeout() {
+		private Socket HandleTimeout(Socket socket) {
 			var config = KetchupConfig.Current;
 			LastConnectionFailure = DateTime.Now;
 			
@@ -85,8 +85,8 @@ namespace Ketchup {
 
 			IsDead = true;
 			DeadAt = LastConnectionFailure;
-			socket = null;
-			return false;
+			
+			return socket;
 		}
 
 		public Node Request(byte[] packet, Action<byte[]> callback) {
@@ -94,18 +94,17 @@ namespace Ketchup {
 				throw new Exception("Node is dead");
 
 			//TODO: Make connect async
-			if (socket == null)
-				if (!Connect()) throw new Exception("Connect Failed");
+			var socket = Connect();
+			if(socket==null)
+				throw new Exception("Connect Failed");
 
-
-			if (socket != null)
-				socket.BeginSend(packet, 0, packet.Length, SocketFlags.None,
-					sendState => {
-						((Socket)sendState.AsyncState).EndSend(sendState);
-					},socket);
+			socket.BeginSend(packet, 0, packet.Length, SocketFlags.None,
+				sendState => {
+					((Socket)sendState.AsyncState).EndSend(sendState);
+				},socket);
 
 			var buffer = new byte[1024];
-			if (socket != null && callback != null)
+			if (callback != null)
 				socket.BeginReceive(buffer, 0, 1024, SocketFlags.None,
 					receiveState => {
 						var s = (Socket)receiveState.AsyncState;
