@@ -1,20 +1,19 @@
 ﻿using System;
-using Xunit;
 using System.Threading;
+using Xunit;
 using Ketchup.Async;
-using Ketchup.Config;
 using Ketchup.Protocol.Exceptions;
 
 namespace Ketchup.Tests {
 	public class AsyncTests {
 		private readonly byte[] byteValue = new byte[2000000];
-		private static KetchupClient cli = new KetchupClient(TestHelpers.BuildConfiguration(), "default");
+		private readonly static KetchupClient cli = new KetchupClient(TestHelpers.BuildConfiguration(), "default");
 
 		[Fact]
 		public void FlushWithSuccess() {
 			var key = "flush-success";
 			var value = key + "-value";
-			var address = "DEVCACHE01:11211";
+			var address = TestHelpers.Address;
 
 			TestHelpers.TestAsync((success, fail) => {
 				cli.Set(key, value, success, ex => success());
@@ -95,7 +94,24 @@ namespace Ketchup.Tests {
 		}
 
 		[Fact]
-		public void SetWithExpirationTest() { }
+		public void SetWithExpirationTest() {
+			var key = "set-expiration-success";
+			var value = key + "-value";
+
+			TestHelpers.TestAsync((success, fail) =>
+				 cli.Set(key, value, new TimeSpan(0,0,1), success, fail)
+			);
+
+			Thread.Sleep(2 * 1000);
+			
+			TestHelpers.TestAsync((success, fail) =>
+				cli.Get<string>(key,
+					hit:val => fail(new Exception("Hit fired. Was expecting miss")),
+					miss:success,
+					error:fail
+				)
+			);
+		}
 
 		[Fact]
 		public void GetWithHit() {
@@ -131,12 +147,9 @@ namespace Ketchup.Tests {
 
 			TestHelpers.TestAsync((success, fail) =>
 				cli.Get<string>(key,
-					//hit
-					val => fail(new Exception("Hit fired. Was expecting miss")),
-					//miss
-					success,
-					//error
-					fail
+					hit:val => fail(new Exception("Hit fired. Was expecting miss")),
+					miss:success,
+					error:fail
 				)
 			);
 		}
@@ -148,8 +161,7 @@ namespace Ketchup.Tests {
 
 			//first set the value
 			TestHelpers.TestAsync((success,fail) => {
-				cli.Set(key,value);
-				success();
+				cli.Set(key,value,success,fail);
 			});
 
 			TestHelpers.TestAsync((success, fail) =>
@@ -314,5 +326,30 @@ namespace Ketchup.Tests {
 			});
 		}
 
+		[Fact]
+		public void VersionTest() {
+			var expected = "1.6.0beta4_37_g036e93d";
+			TestHelpers.TestAsync((success, fail) => {
+				cli.Version(TestHelpers.Address,
+				success: actual => {
+					Assert.Equal(expected, actual);
+					success();
+				}, error: fail);
+			});
+		}
+
+		[Fact]
+		public void NoOpTest() {
+			TestHelpers.TestAsync((success, fail) => {
+				cli.NoOp(TestHelpers.Address,success, fail);
+			});
+		}
+
+		[Fact]
+		public void QuitTest() {
+			TestHelpers.TestAsync((success, fail) => {
+				cli.Quit(TestHelpers.Address, success, fail);
+			});
+		}
 	}
 }

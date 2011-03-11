@@ -8,9 +8,11 @@ using System.Threading;
 
 namespace Ketchup.Tests {
 	public static class TestHelpers {
+		public const string Address = "DEVCACHE01:11211";
+
 		public static KetchupConfig BuildConfiguration() {
 			var kc = new KetchupConfig()
-				.AddNode("DEVCACHE01:11211")
+				.AddNode(Address)
 				.AddBucket();
 
 			return kc;

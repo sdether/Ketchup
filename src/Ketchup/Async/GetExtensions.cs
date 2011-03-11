@@ -8,13 +8,6 @@ namespace Ketchup.Async {
 			Operations.Get(Op.GetK, key, client.Bucket, hit, miss, error);
 			return client;
 		}
-
-		//what does GetQ mean in a callback world?
-		//public static KetchupClient GetQ<T>(this KetchupClient client, string key,
-		//    Action<T> hit, Action miss, Action<Exception> error) {
-		//    Operations.Get(Op.GetQ, key, client.Bucket, hit, miss, error);
-		//    return client;
-		//}
 	}
 }
 

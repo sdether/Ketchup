@@ -5,14 +5,14 @@ using Ketchup.Protocol.Exceptions;
 using System.Collections.Generic;
 
 namespace Ketchup.Protocol {
-	internal static class Operations {
+	internal static class Operations {	
 		private static readonly KetchupConfig config = KetchupConfig.Current;
 
 		public static void Get<T>(Op operation, string key, string bucket, Action<T> hit, Action miss, Action<Exception> error) {
 			var packet = new Packet<T>(operation, config.GetKey(key, bucket));
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 					try {
-						hit(new Packet<T>().Deserialize(rb));
+						hit(packet.Deserialize(rb));
 					} catch (Exception ex) {
 						if (ex is NotFoundException) {
 							miss();
@@ -34,7 +34,7 @@ namespace Ketchup.Protocol {
 			if(success != null && error != null) {
 				Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 						try {
-							new Packet<T>().Deserialize(rb);
+							packet.Deserialize(rb);
 							success();
 						} catch (Exception ex) {
 							error(ex);
@@ -52,7 +52,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<string>(operation, config.GetKey(key, bucket));
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(),rb => {
 				try {
-					new Packet<string>().Deserialize(rb);
+					packet.Deserialize(rb);
 					success();
 				} catch (Exception ex) {
 					error(ex);
@@ -69,7 +69,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<long>(operation, config.GetKey(key, bucket)).Extras(extras);
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 				try {
-					success(new Packet<long>().Deserialize(rb));
+					success(packet.Deserialize(rb));
 				} catch (Exception ex) {
 					error(ex);
 				}
@@ -87,7 +87,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<string>(operation, "");
 			node.Request(packet.Serialize(), rb => {
 				try {
-					new Packet<string>().Deserialize(rb);
+					packet.Deserialize(rb);
 					success();
 				} catch (Exception ex) {
 					error(ex);
@@ -102,7 +102,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<string>(operation, "").Extras(extras);
 			node.Request(packet.Serialize(), rb => {
 				try {
-					new Packet<string>().Deserialize(rb);
+					packet.Deserialize(rb);
 					success();
 				} catch (Exception ex) {
 					error(ex);
@@ -114,7 +114,7 @@ namespace Ketchup.Protocol {
 			var packet = new Packet<string>(operation, "");
 			node.Request(packet.Serialize(), rb => {
 				try {
-					success(new Packet<string>().Deserialize(rb));
+					success(packet.Deserialize(rb));
 				} catch (Exception ex) {
 					error(ex);
 				}
@@ -128,7 +128,7 @@ namespace Ketchup.Protocol {
 			if (success != null && error != null) {
 				Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 					try {
-						new Packet<string>().Deserialize(rb);
+						packet.Deserialize(rb);
 						success();
 					} catch (Exception ex) {
 						error(ex);
@@ -146,7 +146,7 @@ namespace Ketchup.Protocol {
 			node = string.IsNullOrEmpty(key) ? node : Hasher.GetNode(key, bucket);
 			node.Request(packet.Serialize(), rb => {
 				try {
-					var value = new Packet<string>().Deserialize(rb);
+					var value = packet.Deserialize(rb);
 					packet.Key(out key);
 					if (key == "" && value == "")
 						complete();

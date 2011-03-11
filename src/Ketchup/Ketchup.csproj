@@ -42,11 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\CRC32.cs" />
-    <Compile Include="Async\AppendPrependExtensions.cs" />
+    <Compile Include="Async\AppendExtensions.cs" />
+    <Compile Include="Async\AdminExtensions.cs" />
+    <Compile Include="Async\AddExtensions.cs" />
+    <Compile Include="Async\ReplaceExtensions.cs" />
+    <Compile Include="Async\PrependExtensions.cs" />
     <Compile Include="Async\FlushExtensions.cs" />
     <Compile Include="Async\IncrDecrExtensions.cs" />
     <Compile Include="Async\DeleteExtensions.cs" />
-    <Compile Include="Async\SetAddReplaceExtensions.cs" />
+    <Compile Include="Async\SetExtensions.cs" />
     <Compile Include="Bucket.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
     <Compile Include="Hashing\IHashingAlgortihm.cs" />

@@ -89,7 +89,11 @@ namespace Ketchup.Config {
 		}
 
 		public Node GetNode(string address) {
-			return nodes.GetById(address);
+			var node = nodes.GetById(address);
+			if(node == null)
+				throw new Exception("Host and port specified are not a valid node in the Ketchup Config");
+
+			return node;
 		}
 
 		public IList<Node> GetNodes(string bucket) {
