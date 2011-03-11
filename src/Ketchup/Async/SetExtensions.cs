@@ -4,7 +4,8 @@ using Ketchup.Protocol;
 namespace Ketchup.Async {
 
 	public static class SetExtensions {
-		private static KetchupClient Set<T>(this KetchupClient client, string key, T value, int expiration,
+
+		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, int expiration,
 			Action success, Action<Exception> error) {
 
 			var op = success == null ? Op.SetQ : Op.Set;
@@ -31,29 +32,6 @@ namespace Ketchup.Async {
 			return Set(client, key, value, exp, success, error);
 		}
 
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, Action<Exception> error) {
-			return Set(client, key, value, null, error);
-		}
-
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, TimeSpan expiration, Action<Exception> error) {
-			return Set(client, key, value, expiration, null, error);
-		}
-
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, DateTime expiration, Action<Exception> error) {
-			return Set(client, key, value, expiration, null, error);
-		}
-
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value) {
-			return Set(client, key, value, null, null);
-		}
-
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, TimeSpan expiration) {
-			return Set(client, key, value, expiration, null, null);
-		}
-
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, DateTime expiration) {
-			return Set(client, key, value, expiration, null, null);
-		}
 	}
 }
 
