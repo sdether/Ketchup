@@ -15,9 +15,9 @@ namespace Ketchup.Protocol {
 						hit(packet.Deserialize(rb));
 					} catch (Exception ex) {
 						if (ex is NotFoundException) {
-							miss();
+							if(miss != null) miss();
 						} else {
-							error(ex);
+							if(error != null) error(ex);
 						}
 					}
 				});
@@ -31,21 +31,14 @@ namespace Ketchup.Protocol {
 			key = config.GetKey(key, bucket);
 			var packet = new Packet<T>(operation, key).Extras(extras).Value(value);
 
-			if(success != null && error != null) {
-				Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
-						try {
-							packet.Deserialize(rb);
-							success();
-						} catch (Exception ex) {
-							error(ex);
-						}
-					}
-				);
-			}
-			else {
-				//shh...
-				Hasher.GetNode(key, bucket).Request(packet.Serialize(), null);
-			}
+			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
+				try {
+					packet.Deserialize(rb);
+					if(success != null) success();
+				} catch (Exception ex) {
+					if(error != null) error(ex);
+				}
+			});
 		}
 
 		public static void Delete(Op operation, string key, string bucket, Action success, Action<Exception> error) {
@@ -53,9 +46,9 @@ namespace Ketchup.Protocol {
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(),rb => {
 				try {
 					packet.Deserialize(rb);
-					success();
+					if(success != null) success();
 				} catch (Exception ex) {
-					error(ex);
+					if(error != null) error(ex);
 				}
 			});
 		}
