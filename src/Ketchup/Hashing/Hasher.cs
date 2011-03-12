@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using Ketchup.Config;
-using Ketchup.Algorithms;
 
 namespace Ketchup.Hashing {
 

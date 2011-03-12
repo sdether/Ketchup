@@ -19,7 +19,7 @@ namespace Ketchup.Async {
 
 		public static KetchupClient IncrDecr(this KetchupClient client, 
 			string key, long step, Action<long> success, Action<Exception> error) {
-			return client.IncrDecr(key: key, initial: 0, step: step, expiration: 0, success: success, error: error);
+			return client.IncrDecr(key, 0, step, 0, success, error);
 		}
 
 		public static KetchupClient IncrDecr(this KetchupClient client,

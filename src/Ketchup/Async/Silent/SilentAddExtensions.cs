@@ -1,5 +1,4 @@
 ﻿using System;
-using Ketchup.Async;
 
 namespace Ketchup.Async.Silent {
 

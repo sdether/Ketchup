@@ -1,8 +1,4 @@
-﻿using System;
-using Ketchup.Protocol;
-using Ketchup.Config;
-
-namespace Ketchup.Async.Silent {
+﻿namespace Ketchup.Async.Silent {
 
 	public static class SilentAdminExtensions {
 

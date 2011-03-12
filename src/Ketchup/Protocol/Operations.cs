@@ -2,7 +2,6 @@
 using Ketchup.Config;
 using Ketchup.Hashing;
 using Ketchup.Protocol.Exceptions;
-using System.Collections.Generic;
 
 namespace Ketchup.Protocol {
 	internal static class Operations {	

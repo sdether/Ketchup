@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using Ketchup.Protocol.Exceptions;
-using NotSupportedException = System.NotSupportedException;
-using OutOfMemoryException = System.OutOfMemoryException;
 
 namespace Ketchup.Protocol {
 	internal class Packet<T> {
 		private const short headerl = 24;
 		private readonly byte[] headerb = new byte[24];
-		private bool hasval = false;
+		private bool hasval;
 		private byte[] extrasb = new byte[0];
 		private byte[] keyb = new byte[0];
 		private byte[] valb;

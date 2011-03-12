@@ -1,6 +1,4 @@
 ﻿using System;
-using Ketchup.Protocol;
-using Ketchup.Async;
 
 namespace Ketchup.Async.Quiet {
 

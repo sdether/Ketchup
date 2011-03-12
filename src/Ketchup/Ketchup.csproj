@@ -45,6 +45,7 @@
     <Compile Include="Async\AppendPrependExtensions.cs" />
     <Compile Include="Async\AdminExtensions.cs" />
     <Compile Include="Async\AddExtensions.cs" />
+    <Compile Include="Async\Quiet\QuietFlushExtensions.cs" />
     <Compile Include="Async\Quiet\QuietAppendPrependExtensions.cs" />
     <Compile Include="Async\Quiet\QuietIncrDecrExtensions.cs" />
     <Compile Include="Async\Quiet\QuietDeleteExtensions.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Async\IncrDecrExtensions.cs" />
     <Compile Include="Async\DeleteExtensions.cs" />
     <Compile Include="Async\SetExtensions.cs" />
+    <Compile Include="Async\Silent\SilentFlushExtensions.cs" />
     <Compile Include="Async\Silent\SilentAppendPrependExtensions.cs" />
     <Compile Include="Async\Silent\SilentIncrDecrExtensions.cs" />
     <Compile Include="Async\Silent\SilentAdminExtensions.cs" />

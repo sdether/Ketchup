@@ -1,7 +1,4 @@
-﻿using System;
-using Ketchup.Protocol;
-
-namespace Ketchup.Async.Silent {
+﻿namespace Ketchup.Async.Silent {
 
 	public static class SilentAppendPrependExtensions {
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ketchup.Algorithms {
+namespace Ketchup.Hashing{
 	internal class Crc32 {
 		readonly uint[] table;
 		public uint GetUInt(byte[] bytes) {

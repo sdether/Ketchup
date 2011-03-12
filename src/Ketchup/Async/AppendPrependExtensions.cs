@@ -9,7 +9,7 @@ namespace Ketchup.Async {
 			string value, Action success, Action<Exception> error) {
 
 			var op = success == null ? Op.AppendQ : Op.Append;
-			Operations.AppendPrepend(Op.Append, key, value, client.Bucket, success, error);
+			Operations.AppendPrepend(op, key, value, client.Bucket, success, error);
 			return client;
 		}
 
@@ -17,7 +17,7 @@ namespace Ketchup.Async {
 			string value, Action success, Action<Exception> error) {
 		
 			var op = success == null ? Op.PrependQ : Op.Prepend;
-			Operations.AppendPrepend(Op.Prepend, key, value, client.Bucket, success, error);
+			Operations.AppendPrepend(op, key, value, client.Bucket, success, error);
 			return client;
 		}
 	}
