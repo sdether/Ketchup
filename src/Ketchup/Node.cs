@@ -38,14 +38,13 @@ namespace Ketchup {
 			LastConnectionFailure = DateTime.MinValue;
 		}
 
-		public Node(string host, int port)
-			: this() {
+		public Node(string host, int port) : this() {
 			Host = host;
 			Port = port;
 		}
 
-		public void Request(byte[] packet, Action<byte[]> callback) {
-			var state = new NodeAsyncState() { Callback = callback, Socket = NodeSocket };
+		public void Request(byte[] packet, Action<byte[]> process) {
+			var state = new NodeAsyncState() { Socket = NodeSocket, Process = process };
 			state.Socket.BeginSend(packet, 0, packet.Length, SocketFlags.None, SendData, state);
 		}
 
@@ -62,7 +61,7 @@ namespace Ketchup {
 			var remote = state.Socket;
 
 			remote.EndReceive(asyncResult);
-			if (state.Callback != null) state.Callback(_buffer);
+			if (state.Process != null) state.Process(_buffer);
 		}
 
 		private Socket Connect(Socket socket) {
@@ -128,7 +127,7 @@ namespace Ketchup {
 
 		private class NodeAsyncState {
 			public Socket Socket { get; set; }
-			public Action<byte[]> Callback { get; set; }
+			public Action<byte[]> Process { get; set; }
 		}
 	}
 }
