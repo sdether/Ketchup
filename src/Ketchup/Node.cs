@@ -7,17 +7,28 @@ namespace Ketchup {
 	public class Node {
 
 		private readonly byte[] _buffer = new byte[1024];
-		private Socket _socket;
-		
+		private readonly object _sync = new object();
+		private Socket _nodeSocket;
+
 		public int Port { get; set; }
 		public int CurrentRetryCount { get; set; }
-		public bool	IsDead { get; set; }
+		public bool IsDead { get; set; }
 		public string Host { get; set; }
 		public DateTime DeadAt { get; set; }
 		public DateTime LastConnectionFailure { get; set; }
 
 		public string Id {
 			get { return Host + ":" + Port; }
+		}
+
+		private Socket NodeSocket {
+			get {
+				lock (_sync) {
+					if (_nodeSocket == null) 
+						_nodeSocket = Connect(CreateSocket());
+				}
+				return Connect(_nodeSocket);
+			}
 		}
 
 		public Node() {
@@ -27,13 +38,14 @@ namespace Ketchup {
 			LastConnectionFailure = DateTime.MinValue;
 		}
 
-		public Node(string host, int port) : this() {
+		public Node(string host, int port)
+			: this() {
 			Host = host;
 			Port = port;
 		}
 
 		public void Request(byte[] packet, Action<byte[]> callback) {
-			var state = new NodeAsyncState(){ Callback = callback, Socket = Connect()};
+			var state = new NodeAsyncState() { Callback = callback, Socket = NodeSocket };
 			state.Socket.BeginSend(packet, 0, packet.Length, SocketFlags.None, SendData, state);
 		}
 
@@ -42,7 +54,7 @@ namespace Ketchup {
 			var remote = state.Socket;
 
 			remote.EndSend(asyncResult);
-			remote.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveData, state);			
+			remote.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveData, state);
 		}
 
 		private void ReceiveData(IAsyncResult asyncResult) {
@@ -53,29 +65,27 @@ namespace Ketchup {
 			if (state.Callback != null) state.Callback(_buffer);
 		}
 
-		private Socket Connect() {
-			return Connect(_socket);
-		}
-
 		private Socket Connect(Socket socket) {
-			if (IsDead) throw new Exception("Node is dead");
 			if (socket != null && socket.Connected) return socket;
+			if (IsDead) throw new Exception("Node is dead");
+			if (socket == null) socket = CreateSocket();
+
 			if (string.IsNullOrEmpty(Host)) throw new Exception("Host is null or empty string, cannot connect to socket");
 			if (Port == default(int)) throw new Exception("Port is not valid for this Node, cannot connect to socket");
-			if (socket == null) socket = CreateSocket();
 
 			try {
 				//if a connection error happened before, recurse until reconnect time has passed
-				if(!ReadyToTry()) return Connect(socket);
+				if (!ReadyToTry()) Connect(socket);
 
 				//the big kahuna
 				socket.Connect(Host, Port);
 
 			} catch (SocketException ex) {
 				//at least retry timeouts the specified number of times
-				if(ex.SocketErrorCode == SocketError.TimedOut) return HandleTimeout(socket);
+				if (ex.SocketErrorCode == SocketError.TimedOut) return HandleTimeout(socket);
 				throw;
 			}
+
 			return socket;
 		}
 
@@ -92,13 +102,13 @@ namespace Ketchup {
 		}
 
 		private bool ReadyToTry() {
-			if(LastConnectionFailure == DateTime.MinValue) return true;
+			if (LastConnectionFailure == DateTime.MinValue) return true;
 			return (DateTime.Now - LastConnectionFailure) >= KetchupConfig.Current.ConnectionRetryDelay;
 		}
 
 		private Socket HandleTimeout(Socket socket) {
 			LastConnectionFailure = DateTime.Now;
-			
+
 			if (CurrentRetryCount++ >= KetchupConfig.Current.ConnectionRetryCount) {
 				IsDead = true;
 				DeadAt = LastConnectionFailure;
