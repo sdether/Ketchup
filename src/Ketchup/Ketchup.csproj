@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithms\CRC32.cs" />
     <Compile Include="Async\AppendPrependExtensions.cs" />
     <Compile Include="Async\AdminExtensions.cs" />
     <Compile Include="Async\AddExtensions.cs" />
@@ -70,6 +69,7 @@
     <Compile Include="Async\Silent\SilentSetExtensions.cs" />
     <Compile Include="Bucket.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
+    <Compile Include="Hashing\CRC32.cs" />
     <Compile Include="Hashing\IHashingAlgortihm.cs" />
     <Compile Include="Protocol\Key.cs" />
     <Compile Include="Protocol\Operations.cs" />

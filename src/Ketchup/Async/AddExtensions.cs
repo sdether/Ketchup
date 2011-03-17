@@ -8,7 +8,7 @@ namespace Ketchup.Async {
 		public static KetchupClient Add<T>(this KetchupClient client, string key, T value, int expiration,
 			Action success, Action<Exception> error) {
 
-			var op = success == null ? Op.SetQ : Op.Set;
+			var op = success == null ? Op.AddQ : Op.Add;
 			Operations.SetAddReplace(op, key, value, expiration, client.Bucket, success, error);
 			return client;
 		}
