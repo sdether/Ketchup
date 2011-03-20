@@ -24,7 +24,7 @@ namespace Ketchup {
 		private Socket NodeSocket {
 			get {
 				lock (_sync) {
-					if (_nodeSocket == null) 
+					if (_nodeSocket == null)
 						_nodeSocket = Connect(CreateSocket());
 				}
 				return Connect(_nodeSocket);
@@ -38,30 +38,46 @@ namespace Ketchup {
 			LastConnectionFailure = DateTime.MinValue;
 		}
 
-		public Node(string host, int port) : this() {
+		public Node(string host, int port)
+			: this() {
 			Host = host;
 			Port = port;
 		}
 
 		public void Request(byte[] packet, Action<byte[]> process) {
-			var state = new NodeAsyncState() { Socket = NodeSocket, Process = process };
-			state.Socket.BeginSend(packet, 0, packet.Length, SocketFlags.None, SendData, state);
+			try {
+				var state = new NodeAsyncState() { Socket = NodeSocket, Process = process };
+				state.Socket.BeginSend(packet, 0, packet.Length, SocketFlags.None, SendData, state);
+			} catch {
+				throw;
+			}
+
 		}
 
 		private void SendData(IAsyncResult asyncResult) {
-			var state = (NodeAsyncState)asyncResult.AsyncState;
-			var remote = state.Socket;
+			try {
+				var state = (NodeAsyncState)asyncResult.AsyncState;
+				var remote = state.Socket;
 
-			remote.EndSend(asyncResult);
-			remote.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveData, state);
+				remote.EndSend(asyncResult);
+				remote.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveData, state);
+			} catch {
+				throw;
+			}
+
 		}
 
 		private void ReceiveData(IAsyncResult asyncResult) {
-			var state = (NodeAsyncState)asyncResult.AsyncState;
-			var remote = state.Socket;
+			try {
+				var state = (NodeAsyncState)asyncResult.AsyncState;
+				var remote = state.Socket;
 
-			remote.EndReceive(asyncResult);
-			if (state.Process != null) state.Process(_buffer);
+				remote.EndReceive(asyncResult);
+				if (state.Process != null) state.Process(_buffer);
+			} catch {
+				throw;
+			}
+
 		}
 
 		private Socket Connect(Socket socket) {
@@ -92,8 +108,8 @@ namespace Ketchup {
 			var config = KetchupConfig.Current;
 
 			return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) {
-				SendTimeout = config.ConnectionTimeout.Milliseconds,
-				ReceiveTimeout = config.ConnectionTimeout.Milliseconds,
+				SendTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
+				ReceiveTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
 				NoDelay = true,
 				Blocking = true,
 				UseOnlyOverlappedIO = false

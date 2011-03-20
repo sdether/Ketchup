@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ketchup.Config;
-using Ketchup.Async;
 using System.Threading;
+using Ketchup.Config;
 
 namespace Ketchup.Tests {
 	public static class TestHelpers {
@@ -18,18 +14,18 @@ namespace Ketchup.Tests {
 			return kc;
 		}
 
-		public static void TestAsync(Action<Action, Action<Exception>> action) {
+		public static void TestAsync(Action<Action<string>, Action<string, Exception>> action) {
 			var resetEvent = new ManualResetEvent(initialState: false);
 			Exception exception = null;
 
 			action(
 				//delegate to invoke on test success
-				() => {
+				(key) => {
 					resetEvent.Set();
 				},
 
 				//delegate to invoke on test error
-				e => {
+				(key, e) => {
 					exception = e;
 					resetEvent.Set();
 				});

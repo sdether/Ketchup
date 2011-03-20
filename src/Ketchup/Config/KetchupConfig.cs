@@ -100,8 +100,12 @@ namespace Ketchup.Config {
 			return bucketNodes[bucket];
 		}
 
-		public string GetKey(string key, string bucket) {
+		public string GetPrefixKey(string key, string bucket) {
 			return buckets[bucket].Prefix ? bucket + "-" + key : key;
+		}
+
+		public string GetOriginalKey(string key, string bucket) {
+			return buckets[bucket].Prefix ? key.Substring(bucket.Length + 1) : key;
 		}
 
 		public static KetchupConfig Init(KetchupConfig config) {

@@ -11,18 +11,20 @@ namespace Ketchup.Protocol {
 		private byte[] extrasb = new byte[0];
 		private byte[] keyb = new byte[0];
 		private byte[] valb;
-		
+
 		private T valueT;
 
 		public Packet() {
 			if (headerb != null) headerb[0] = (byte)Protocol.Magic.Request; //magic default
 		}
 
-		public Packet(Op operation) : this() {
+		public Packet(Op operation)
+			: this() {
 			Operation(operation);
 		}
 
-		public Packet(Op operation, string key) : this(operation) {
+		public Packet(Op operation, string key)
+			: this(operation) {
 			Key(key);
 		}
 
@@ -43,7 +45,7 @@ namespace Ketchup.Protocol {
 			return this;
 		}
 
-		public Packet<T> Operation(out Op op){
+		public Packet<T> Operation(out Op op) {
 			op = (Op)headerb[1];
 			return this;
 		}
@@ -112,8 +114,13 @@ namespace Ketchup.Protocol {
 		}
 
 		public Packet<T> Key(byte[] returnb, int index, short length) {
-			keyb = new byte[length];
-			Array.Copy(returnb, index, keyb, 0, length);
+			try {
+				keyb = new byte[length];
+				Array.Copy(returnb, index, keyb, 0, length);
+			} catch {
+				throw;
+			}
+
 			return this;
 		}
 
@@ -129,9 +136,13 @@ namespace Ketchup.Protocol {
 		}
 
 		public Packet<T> Value(byte[] returnb, int index, int length) {
-			valb = new byte[length];
-			Array.Copy(returnb, index, valb, 0, length);
-			hasval = true;
+			try {
+				valb = new byte[length];
+				Array.Copy(returnb, index, valb, 0, length);
+				hasval = true;
+			} catch (Exception ex) {
+				throw ex;
+			}
 			return this;
 		}
 
@@ -203,7 +214,7 @@ namespace Ketchup.Protocol {
 
 
 			}
-			
+
 		}
 
 		public byte[] Serialize() {

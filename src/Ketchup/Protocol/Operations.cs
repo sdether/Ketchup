@@ -2,13 +2,14 @@
 using Ketchup.Config;
 using Ketchup.Hashing;
 using Ketchup.Protocol.Exceptions;
+using System.Diagnostics;
 
 namespace Ketchup.Protocol {
 	internal static class Operations {	
 		private static readonly KetchupConfig config = KetchupConfig.Current;
 
 		public static void Get<T>(Op operation, string key, string bucket, Action<T> hit, Action miss, Action<Exception> error) {
-			var packet = new Packet<T>(operation, config.GetKey(key, bucket));
+			var packet = new Packet<T>(operation, config.GetPrefixKey(key, bucket));
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 					try {
 						hit(packet.Deserialize(rb));
@@ -16,7 +17,7 @@ namespace Ketchup.Protocol {
 						if (ex is NotFoundException) {
 							if(miss != null) miss();
 						} else {
-							if(error != null) error(ex);
+							if (error != null) error(ex);
 						}
 					}
 				});
@@ -26,26 +27,23 @@ namespace Ketchup.Protocol {
 			//may move the extras parser into the packet itself
 			var extras = new byte[8];
 			expiration.CopyTo(extras, 4);
-
-			key = config.GetKey(key, bucket);
-			var packet = new Packet<T>(operation, key).Extras(extras).Value(value);
-
+			var packet = new Packet<T>(operation, config.GetPrefixKey(key, bucket)).Extras(extras).Value(value);
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 				try {
 					packet.Deserialize(rb);
 					if(success != null) success();
-				} catch (Exception ex) {
-					if(error != null) error(ex);
+				} catch {
+					throw;
+					//if(error != null) error(ex);
 				}
 			});
 		}
 
 		public static void Delete(Op operation, string key, string bucket, Action success, Action<Exception> error) {
-			var packet = new Packet<string>(operation, config.GetKey(key, bucket));
+			var packet = new Packet<string>(operation, config.GetPrefixKey(key, bucket));
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(),rb => {
 				try {
 					packet.Deserialize(rb);
-					if(success != null) success();
 				} catch (Exception ex) {
 					if(error != null) error(ex);
 				}
@@ -58,7 +56,7 @@ namespace Ketchup.Protocol {
 			initial.CopyTo(extras, 8);
 			expiration.CopyTo(extras, 16);
 
-			var packet = new Packet<long>(operation, config.GetKey(key, bucket)).Extras(extras);
+			var packet = new Packet<long>(operation, config.GetPrefixKey(key, bucket)).Extras(extras);
 			Hasher.GetNode(key, bucket).Request(packet.Serialize(), rb => {
 				try {
 					success(packet.Deserialize(rb));
@@ -114,7 +112,7 @@ namespace Ketchup.Protocol {
 		}
 
 		public static void AppendPrepend(Op operation, string key, string value, string bucket, Action success, Action<Exception> error) {
-			key = config.GetKey(key, bucket);
+			key = config.GetPrefixKey(key, bucket);
 			var packet = new Packet<string>(operation, key).Value(value);
 
 			if (success != null && error != null) {
@@ -134,7 +132,7 @@ namespace Ketchup.Protocol {
 
 		public static void Stat(Op operation, string key, string bucket, Node node, Action<string,string> each, Action complete, Action<Exception> error) {
 			var packet = new Packet<string>(Op.Stat, key);
-			key = config.GetKey(key, bucket);
+			key = config.GetPrefixKey(key, bucket);
 			node = string.IsNullOrEmpty(key) ? node : Hasher.GetNode(key, bucket);
 			node.Request(packet.Serialize(), rb => {
 				try {
