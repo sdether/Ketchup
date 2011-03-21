@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Configuration;
 using System.Net.Sockets;
+using System.Linq;
 using Ketchup.Config;
+using System.Collections.Generic;
 
 namespace Ketchup {
 	public class Node {
-
-		private readonly byte[] _buffer = new byte[1024];
+		private static readonly int _bufferLength = 1024;
 		private readonly object _sync = new object();
 		private Socket _nodeSocket;
 
@@ -46,7 +47,7 @@ namespace Ketchup {
 
 		public void Request(byte[] packet, Action<byte[]> process) {
 			try {
-				var state = new NodeAsyncState() { Socket = NodeSocket, Process = process };
+				var state = new NodeAsyncState() { Socket = NodeSocket, Process = process};
 				state.Socket.BeginSend(packet, 0, packet.Length, SocketFlags.None, SendData, state);
 			} catch {
 				throw;
@@ -59,8 +60,10 @@ namespace Ketchup {
 				var state = (NodeAsyncState)asyncResult.AsyncState;
 				var remote = state.Socket;
 
+				state.Buffer = new byte[_bufferLength];
+				state.Received = new List<byte>();
 				remote.EndSend(asyncResult);
-				remote.BeginReceive(_buffer, 0, _buffer.Length, SocketFlags.None, ReceiveData, state);
+				remote.BeginReceive(state.Buffer, 0, _bufferLength, SocketFlags.None, ReceiveData, state);
 			} catch {
 				throw;
 			}
@@ -72,8 +75,19 @@ namespace Ketchup {
 				var state = (NodeAsyncState)asyncResult.AsyncState;
 				var remote = state.Socket;
 
-				remote.EndReceive(asyncResult);
-				if (state.Process != null) state.Process(_buffer);
+
+				//TODO: Optimize this whole shiz
+				int read = remote.EndReceive(asyncResult);
+				state.Received.AddRange(state.Buffer.Take(read));
+
+				if (read < _bufferLength) {
+					if (state.Process != null) state.Process(state.Received.ToArray());
+				} else {
+					//socket is not complete, call Read again with a new buffer
+					state.Buffer = new byte[_bufferLength];
+					remote.BeginReceive(state.Buffer, 0, _bufferLength, SocketFlags.None, ReceiveData, state);
+				}
+				
 			} catch {
 				throw;
 			}
@@ -144,6 +158,8 @@ namespace Ketchup {
 		private class NodeAsyncState {
 			public Socket Socket { get; set; }
 			public Action<byte[]> Process { get; set; }
+			public byte[] Buffer { get; set; }
+			public List<byte> Received { get; set; }
 		}
 	}
 }
