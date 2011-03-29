@@ -36,7 +36,7 @@ namespace Ketchup.Protocol.Commands
 			var op = (SetAddReplaceCommand<T>)Operation;
 			try
 			{
-				new Packet<T>().Deserialize(response);
+				new Packet<T>(response).Value();
 				if (op.Success != null) op.Success(op.State);
 			}
 			catch (Exception ex)

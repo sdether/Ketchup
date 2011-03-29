@@ -16,7 +16,7 @@ namespace Ketchup.Protocol.Operations
 			return new byte[_bufferLength];
 		}
 
-		public static void Drain(byte[] buffer, ConcurrentQueue<Operation> readQueue, ConcurrentQueue<Operation> processQueue)
+		public static List<byte> Drain(List<byte> buffer, ConcurrentQueue<Operation> readQueue, ConcurrentQueue<Operation> processQueue)
 		{
 			lock (_sync)
 			{
@@ -26,33 +26,28 @@ namespace Ketchup.Protocol.Operations
 					//no idea what to do with this error, need a generic error handler for the whole instance?
 					throw new Exception("Bytes were received from the buffer but no operations were available in the ReadQueue");
 
+				var responseLength = 0;
 				try
 				{
 					//in memcached ordering is preserverd so the first response in the buffer 
 					//should be the first item in the readQueue. I have 0 confidence this will work
-					if (buffer[0] != (byte)Magic.Response) throw new Exception("Magic byte is not the first byte in the response");
+					if (buffer[0] != (byte)Magic.Response) 
+						throw new Exception("Magic byte is not the first byte in the response");
 
 					//get the working set and send that back to the processor
-					var nextMagic = Array.IndexOf(buffer, (byte)Magic.Response, 1);
-					var responseLength = nextMagic < 1 ? buffer.Length : nextMagic;
-					op.Response = new byte[responseLength];
-					Array.Copy(buffer, op.Response, responseLength);
+					responseLength = new PacketHeader(buffer).PacketLength;
+					op.Response = buffer.Take(responseLength).ToArray();
 
 					//add the response back to the ProcessQueue to be handled by the Processor thread
 					processQueue.Enqueue(op);
-
-					//we finished draining the buffer, return;
-					if (nextMagic < 1) return;
-
-					//create the new buffer and call drain again
-					var newbuffer = new byte[buffer.Length - nextMagic];
-					Array.Copy(buffer, nextMagic, newbuffer, 0, newbuffer.Length);
-					Drain(newbuffer, readQueue, processQueue);
 				}
 				catch (Exception ex)
 				{
 					op.Error(ex, op.State);
 				}
+
+				//create the new buffer and call drain again
+				return new List<byte>(buffer.Skip(responseLength));
 			}
 		}
 

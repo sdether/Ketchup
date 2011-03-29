@@ -31,10 +31,10 @@ namespace Ketchup.Protocol.Commands
 		private static void Process(byte[] response, object command)
 		{
 			var op = (GetCommand<T>)command;
-			var packet = new Packet<T>();
 			try
 			{
-				op.Hit(packet.Deserialize(response), op.State);
+				var packet = new Packet<T>(response);
+				op.Hit(packet.Value(), op.State);
 			}
 			catch (ProtocolException ex)
 			{

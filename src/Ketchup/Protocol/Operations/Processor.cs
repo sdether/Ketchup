@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -8,13 +9,14 @@ namespace Ketchup.Protocol.Operations
 {
 	public class Processor
 	{
-		private readonly object _sync = new object();
+		private static readonly object _sync = new object();
 
 		public bool Started { get; set; }
 		public Node Node { get; private set; }
 		public ConcurrentQueue<Operation> WriteQueue = new ConcurrentQueue<Operation>();
 		public ConcurrentQueue<Operation> ReadQueue = new ConcurrentQueue<Operation>();
 		public ConcurrentQueue<Operation> ProcessQueue = new ConcurrentQueue<Operation>();
+		public List<byte> ReadBuffer = new List<byte>();
 
 		public Processor(Node node)
 		{
@@ -40,6 +42,10 @@ namespace Ketchup.Protocol.Operations
 						//likewise, skip Receive if nothing in the queue
 						if (!processor.ReadQueue.IsEmpty)
 							processor.Receive();
+
+						//drain any data received from the socket
+						if (processor.ReadBuffer.Count > 0)
+							processor.Drain();
 
 						//process any data that is in the Process queue
 						if (!processor.ProcessQueue.IsEmpty)
@@ -69,26 +75,31 @@ namespace Ketchup.Protocol.Operations
 
 		public void Receive()
 		{
-			var rbuffer = Buffer.GetReceiveBuffer();
 			var rstate = new ReceiveState
 			{
 				Processor = this,
 				Socket = Node.NodeSocket,
-				ReceiveBuffer = rbuffer
+				ReceiveBuffer = Buffer.GetReceiveBuffer(),
 			};
 
 			rstate.Socket.BeginReceive(
-				rbuffer, 0, rbuffer.Length,
+				rstate.ReceiveBuffer, 0, rstate.ReceiveBuffer.Length,
 				SocketFlags.None, ReceiveData, rstate
 			);
 		}
 
-		public void Process()
+		public void Drain()
+		{
+			lock (_sync) ReadBuffer = Buffer.Drain(ReadBuffer, ReadQueue, ProcessQueue);
+		}
+
+		public void Process() 
 		{
 			Operation op;
 			if (!ProcessQueue.TryDequeue(out op)) return;
 			op.Process(op.Response, op.State);
 		}
+
 
 		private static void SendData(IAsyncResult asyncResult)
 		{
@@ -99,13 +110,10 @@ namespace Ketchup.Protocol.Operations
 
 		private static void ReceiveData(IAsyncResult asyncResult)
 		{
-			var state = (ReceiveState)asyncResult.AsyncState;
-			var remote = state.Socket;
-			remote.EndReceive(asyncResult);
-
-			var readQueue = state.Processor.ReadQueue;
-			var processQueue = state.Processor.ProcessQueue;
-			Buffer.Drain(state.ReceiveBuffer, readQueue, processQueue);
+			var rstate = (ReceiveState)asyncResult.AsyncState;
+			var remote = rstate.Socket;
+			var read = remote.EndReceive(asyncResult);
+			lock(_sync) rstate.Processor.ReadBuffer.AddRange(rstate.ReceiveBuffer.Take(read));
 		}
 
 		private class SendState
@@ -119,6 +127,5 @@ namespace Ketchup.Protocol.Operations
 			public Socket Socket { get; set; }
 			public byte[] ReceiveBuffer { get; set; }
 		}
-
 	}
 }

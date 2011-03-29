@@ -1,14 +1,100 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Ketchup.Protocol.Exceptions;
 
 namespace Ketchup.Protocol
 {
-	internal class Packet<T>
+	internal class PacketHeader
 	{
 		private const short headerl = 24;
-		private readonly byte[] headerb = new byte[24];
+		private byte[] headerb = new byte[24];
+
+		public PacketHeader()
+		{
+			if (headerb != null) headerb[0] = (byte)Magic.Request; //magic default
+		}
+
+		public PacketHeader(byte[] returnb)
+		{
+			Array.Copy(returnb, 0, headerb, 0, 24);
+		}
+
+		public PacketHeader(IEnumerable<byte> returnb) 
+		{
+			headerb = returnb.Take(headerl).ToArray();
+		}
+
+		public Magic Magic
+		{
+			get { return (Magic)headerb[0]; }
+			set { headerb[0] = (byte)value; }
+		}
+
+		public Op Command
+		{
+			get { return (Op)headerb[1]; }
+			set { headerb[1] = (byte)value; }
+		}
+
+		public Data DataType
+		{
+			get { return (Data)headerb[5]; }
+			set { headerb[5] = (byte)value; }
+		}
+
+		public Response Status
+		{
+			get { return (Response)headerb.GetInt16(6); }
+			set { ((short)value).CopyTo(headerb, 6); }
+		}
+
+		public int Opaque
+		{
+			get { return headerb.GetInt32(12); }
+			set { value.CopyTo(headerb, 12); }
+		}
+
+		public long CAS
+		{
+			get { return headerb.GetInt64(16); }
+			set { value.CopyTo(headerb, 16); }
+		}
+
+		public byte[] Bytes
+		{
+			get { return headerb; }
+			set { headerb = value; }
+		}
+
+		public short KeyLength
+		{
+			get { return headerb.GetInt16(2); }
+			set { value.CopyTo(headerb, 2); }
+		}
+
+		public short ExtraLength
+		{
+			get { return Convert.ToInt16(headerb[4]); }
+			set { value.CopyTo(headerb, 4, 1); }
+		}
+
+		public int PacketLength
+		{
+			get { return headerl + TotalLength; }
+		}
+
+		public int TotalLength
+		{
+			get { return headerb.GetInt32(8); }
+			set { value.CopyTo(headerb, 8); }
+		}
+	}
+
+	internal class Packet<T>
+	{
+		private PacketHeader header;
 		private bool hasval;
 		private byte[] extrasb = new byte[0];
 		private byte[] keyb = new byte[0];
@@ -16,101 +102,32 @@ namespace Ketchup.Protocol
 
 		private T valueT;
 
-		public Packet()
+		public Packet(Op command)
 		{
-			if (headerb != null) headerb[0] = (byte)Protocol.Magic.Request; //magic default
+			header = new PacketHeader {Command = command};
 		}
 
-		public Packet(Op operation)
-			: this()
-		{
-			Operation(operation);
-		}
-
-		public Packet(Op operation, string key)
-			: this(operation)
+		public Packet(Op command, string key)
+			: this(command)
 		{
 			Key(key);
 		}
 
-		#region fluent
-
-		public Packet<T> Magic(Magic magic)
-		{
-			headerb[0] = (byte)magic;
-			return this;
-		}
-
-		public Packet<T> Magic(out Magic magic)
-		{
-			magic = (Magic)headerb[0];
-			return this;
-		}
-
-		public Packet<T> Operation(Op op)
-		{
-			headerb[1] = (byte)op;
-			return this;
-		}
-
-		public Packet<T> Operation(out Op op)
-		{
-			op = (Op)headerb[1];
-			return this;
-		}
-
-		public Packet<T> DataType(Data data)
-		{
-			headerb[5] = (byte)data;
-			return this;
-		}
-
-		public Packet<T> DataType(out Data data)
-		{
-			data = (Data)headerb[5];
-			return this;
-		}
-
-		public Packet<T> Status(Response status)
-		{
-			((short)status).CopyTo(headerb, 6);
-			return this;
-		}
-
-		public Packet<T> Status(out Response status)
-		{
-			status = (Response)headerb.GetInt16(6);
-			return this;
-		}
-
-		public Packet<T> Opaque(int opaque)
-		{
-			opaque.CopyTo(headerb, 12);
-			return this;
-		}
-
-		public Packet<T> Opaque(out int opaque)
-		{
-			opaque = headerb.GetInt32(12);
-			return this;
-		}
-
-		public Packet<T> CAS(long cas)
-		{
-			cas.CopyTo(headerb, 16);
-			return this;
-		}
-
-		public Packet<T> CAS(out long cas)
-		{
-			cas = headerb.GetInt64(16);
-			return this;
+		public Packet(byte[] returnb) {
+			header = new PacketHeader(returnb);
+			var headerl = header.Bytes.Length;
+			var extral = header.ExtraLength;
+			var keyl = header.KeyLength;
+			var totall = header.TotalLength;
+			Extras(returnb, headerl, extral)
+				.Key(returnb, headerl + extral, keyl)
+				.Value(returnb, headerl + extral + keyl, (totall - (extral + keyl)));
 		}
 
 		public Packet<T> Extras(byte[] extras)
 		{
 			extrasb = extras;
-			ExtraLength(Convert.ToInt16(extras.Length));
+			header.ExtraLength = Convert.ToInt16(extras.Length);
 			return this;
 		}
 
@@ -130,7 +147,7 @@ namespace Ketchup.Protocol
 		public Packet<T> Key(string key)
 		{
 			keyb = Encoding.UTF8.GetBytes(key);
-			KeyLength(Convert.ToInt16(key.Length));
+			header.KeyLength = Convert.ToInt16(key.Length);
 			return this;
 		}
 
@@ -175,64 +192,51 @@ namespace Ketchup.Protocol
 			return this;
 		}
 
-		public Packet<T> Header(byte[] returnb)
-		{
-			Array.Copy(returnb, 0, headerb, 0, 24);
-			return this;
-		}
-
-		#endregion
 		public T Value()
 		{
-			Response status;
+			var status = header.Status;
+			var cmd = header.Command;
 			string key;
-			Op op;
-
-			Status(out status)
-				.Key(out key)
-				.Operation(out op);
+			Key(out key);
 
 			var vals = Encoding.UTF8.GetString(valb);
-
 			switch (status)
 			{
 				case Response.NoError:
 					valueT = valb.GetObject<T>();
 					return valueT;
 				case Response.KeyNotFound:
-					throw new NotFoundException(key, op, vals);
+					throw new NotFoundException(key, cmd, vals);
 				case Response.AuthContinue:
-					throw new AuthContinueException(key, op, vals);
+					throw new AuthContinueException(key, cmd, vals);
 				case Response.AuthError:
-					throw new AuthErrorException(key, op, vals);
+					throw new AuthErrorException(key, cmd, vals);
 				case Response.Busy:
-					throw new BusyException(key, op, vals);
+					throw new BusyException(key, cmd, vals);
 				case Response.IncrDecrNonNumeric:
-					throw new IncrDecrNonNumericException(key, op, vals);
+					throw new IncrDecrNonNumericException(key, cmd, vals);
 				case Response.InternalError:
-					throw new InternalException(key, op, vals);
+					throw new InternalException(key, cmd, vals);
 				case Response.InvalidArguments:
-					throw new InvalidArgumentException(key, op, vals);
+					throw new InvalidArgumentException(key, cmd, vals);
 				case Response.ItemNotStored:
-					throw new ItemNotStoredException(key, op, vals);
+					throw new ItemNotStoredException(key, cmd, vals);
 				case Response.KeyExists:
-					throw new KeyExistsException(key, op, vals);
+					throw new KeyExistsException(key, cmd, vals);
 				case Response.NotSupported:
-					throw new OperationNotSupportedException(key, op, vals);
+					throw new OperationNotSupportedException(key, cmd, vals);
 				case Response.OutOfMemory:
-					throw new ServerOutOfMemoryException(key, op, vals);
+					throw new ServerOutOfMemoryException(key, cmd, vals);
 				case Response.TemporaryFailure:
-					throw new TemporaryFailureException(key, op, vals);
+					throw new TemporaryFailureException(key, cmd, vals);
 				case Response.UnknownCommand:
-					throw new UnknownCommandException(key, op, vals);
+					throw new UnknownCommandException(key, cmd, vals);
 				case Response.ValueTooLarge:
-					throw new ValueTooLargeException(key, op, vals);
+					throw new ValueTooLargeException(key, cmd, vals);
 				case Response.InvalidVBucketServer:
-					throw new InvalidVBucketServer(key, op, vals);
+					throw new InvalidVBucketServer(key, cmd, vals);
 				default:
-					throw new UnknownResponseExcepton(key, op, (short)status, vals);
-
-
+					throw new UnknownResponseExcepton(key, cmd, (short)status, vals);
 			}
 
 		}
@@ -240,69 +244,14 @@ namespace Ketchup.Protocol
 		public byte[] Serialize()
 		{
 			var valueb = hasval ? valueT.GetBytes() : new byte[0];
-			TotalLength(extrasb.Length + keyb.Length + valueb.Length);
+			header.TotalLength = extrasb.Length + keyb.Length + valueb.Length;
 
 			var result = new List<byte>();
-			result.AddRange(headerb);
+			result.AddRange(header.Bytes);
 			result.AddRange(extrasb);
 			result.AddRange(keyb);
 			result.AddRange(valueb);
-
 			return result.ToArray();
-		}
-
-		public T Deserialize(byte[] returnb)
-		{
-			//create a new packet object with the same type T to house the response:
-			short extral;
-			short keyl;
-			int totall;
-
-			return new Packet<T>()
-				.Header(returnb)
-				.ExtraLength(out extral)
-				.KeyLength(out keyl)
-				.TotalLength(out totall)
-				.Extras(returnb, headerl, extral)
-				.Key(returnb, headerl + extral, keyl)
-				.Value(returnb, headerl + extral + keyl, (totall - (extral + keyl)))
-				.Value();
-		}
-
-		private void KeyLength(short length)
-		{
-			length.CopyTo(headerb, 2);
-			return;
-		}
-
-		private Packet<T> KeyLength(out short length)
-		{
-			length = headerb.GetInt16(2);
-			return this;
-		}
-
-		private void ExtraLength(short length)
-		{
-			length.CopyTo(headerb, 4, 1);
-			return;
-		}
-
-		private Packet<T> ExtraLength(out short length)
-		{
-			length = Convert.ToInt16(headerb[4]);
-			return this;
-		}
-
-		private void TotalLength(int length)
-		{
-			length.CopyTo(headerb, 8);
-			return;
-		}
-
-		private Packet<T> TotalLength(out int length)
-		{
-			length = headerb.GetInt32(8);
-			return this;
 		}
 	}
 }
