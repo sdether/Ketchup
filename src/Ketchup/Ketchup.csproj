@@ -41,38 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Async\AppendPrependExtensions.cs" />
-    <Compile Include="Async\AdminExtensions.cs" />
-    <Compile Include="Async\AddExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietFlushExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietAppendPrependExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietIncrDecrExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietDeleteExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietReplaceExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietAdminExtensions.cs" />
-    <Compile Include="Async\ReplaceExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietAddExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietGetExtensions.cs" />
-    <Compile Include="Async\Quiet\QuietSetExtensions.cs" />
-    <Compile Include="Async\FlushExtensions.cs" />
-    <Compile Include="Async\IncrDecrExtensions.cs" />
-    <Compile Include="Async\DeleteExtensions.cs" />
     <Compile Include="Async\SetExtensions.cs" />
-    <Compile Include="Async\Silent\SilentFlushExtensions.cs" />
-    <Compile Include="Async\Silent\SilentAppendPrependExtensions.cs" />
-    <Compile Include="Async\Silent\SilentIncrDecrExtensions.cs" />
-    <Compile Include="Async\Silent\SilentAdminExtensions.cs" />
-    <Compile Include="Async\Silent\SilentDeleteExtensions.cs" />
-    <Compile Include="Async\Silent\SilentReplaceExtensions.cs" />
-    <Compile Include="Async\Silent\SilentAddExtensions.cs" />
-    <Compile Include="Async\Silent\SilentGetExtensions.cs" />
-    <Compile Include="Async\Silent\SilentSetExtensions.cs" />
     <Compile Include="Bucket.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
     <Compile Include="Hashing\CRC32.cs" />
     <Compile Include="Hashing\IHashingAlgortihm.cs" />
-    <Compile Include="Protocol\Key.cs" />
-    <Compile Include="Protocol\Operations.cs" />
+    <Compile Include="Protocol\Commands\SetAddReplaceCommand.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Protocol\Operations\Buffer.cs" />
+    <Compile Include="Protocol\Operations\Operation.cs" />
     <Compile Include="Protocol\Packet.cs" />
     <Compile Include="Protocol\Enums.cs" />
     <Compile Include="Node.cs" />
@@ -85,6 +63,10 @@
     <Compile Include="Hashing\Hasher.cs" />
     <Compile Include="Protocol\PacketExtensions.cs" />
     <Compile Include="Protocol\Exceptions\ProtocolExceptions.cs" />
+    <Compile Include="Protocol\Commands\GetCommand.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Protocol\Operations\Processor.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

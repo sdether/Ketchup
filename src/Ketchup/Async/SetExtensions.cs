@@ -1,25 +1,32 @@
 ﻿using System;
 using Ketchup.Protocol;
+using Ketchup.Protocol.Commands;
 
-namespace Ketchup.Async {
-
+namespace Ketchup.Async
+{
 	public static class SetExtensions {
-
 		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, int expiration,
-			Action success, Action<Exception> error) {
+			Action<object> success, Action<Exception, object> error, object state) {
 
-			var op = success == null ? Op.SetQ : Op.Set;
-			Operations.SetAddReplace(op, key, value, expiration, client.Bucket, success, error);
-			return client;
+			return new SetAddReplaceCommand<T>(key, value) {
+				Client = client,
+				Key = key,
+				Expiration = expiration,
+				Success = success,
+				Error = error,
+				State = state
+			}.Set();
 		}
 
 		public static KetchupClient Set<T>(this KetchupClient client, string key, T value,
-			Action success, Action<Exception> error) {
-			return client.Set(key, value, 0, success, error);
+			Action<object> success, Action<Exception, object> error, object asyncState) {
+
+			return Set(client, key, value, 0, success, error, asyncState);
 		}
 
 		//public static KetchupClient Set<T>(this KetchupClient client, string key, T value, TimeSpan expiration,
-		//    Action success, Action<Exception> error) {
+		//    Action success, Action<Exception> error)
+		//{
 		//    //memcached treats timespans greater than 30 days as unix epoch time, convert to datetime
 		//    return expiration.TotalDays > 30 ?
 		//        client.Set(key, value, DateTime.UtcNow + expiration, success, error) :
@@ -27,7 +34,8 @@ namespace Ketchup.Async {
 		//}
 
 		//public static KetchupClient Set<T>(this KetchupClient client, string key, T value, DateTime expiration,
-		//    Action success, Action<Exception> error) {
+		//    Action success, Action<Exception> error)
+		//{
 		//    var exp = expiration == DateTime.MinValue ? 0 : (expiration - new DateTime(1970, 1, 1)).Seconds;
 		//    return client.Set(key, value, exp, success, error);
 		//}

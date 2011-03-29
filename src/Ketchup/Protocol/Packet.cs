@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using Ketchup.Protocol.Exceptions;
 
-namespace Ketchup.Protocol {
-	internal class Packet<T> {
+namespace Ketchup.Protocol
+{
+	internal class Packet<T>
+	{
 		private const short headerl = 24;
 		private readonly byte[] headerb = new byte[24];
 		private bool hasval;
@@ -14,157 +16,174 @@ namespace Ketchup.Protocol {
 
 		private T valueT;
 
-		public Packet() {
+		public Packet()
+		{
 			if (headerb != null) headerb[0] = (byte)Protocol.Magic.Request; //magic default
 		}
 
 		public Packet(Op operation)
-			: this() {
+			: this()
+		{
 			Operation(operation);
 		}
 
 		public Packet(Op operation, string key)
-			: this(operation) {
+			: this(operation)
+		{
 			Key(key);
 		}
 
 		#region fluent
 
-		public Packet<T> Magic(Magic magic) {
+		public Packet<T> Magic(Magic magic)
+		{
 			headerb[0] = (byte)magic;
 			return this;
 		}
 
-		public Packet<T> Magic(out Magic magic) {
+		public Packet<T> Magic(out Magic magic)
+		{
 			magic = (Magic)headerb[0];
 			return this;
 		}
 
-		public Packet<T> Operation(Op op) {
+		public Packet<T> Operation(Op op)
+		{
 			headerb[1] = (byte)op;
 			return this;
 		}
 
-		public Packet<T> Operation(out Op op) {
+		public Packet<T> Operation(out Op op)
+		{
 			op = (Op)headerb[1];
 			return this;
 		}
 
-		public Packet<T> DataType(Data data) {
+		public Packet<T> DataType(Data data)
+		{
 			headerb[5] = (byte)data;
 			return this;
 		}
 
-		public Packet<T> DataType(out Data data) {
+		public Packet<T> DataType(out Data data)
+		{
 			data = (Data)headerb[5];
 			return this;
 		}
 
-		public Packet<T> Status(Response status) {
+		public Packet<T> Status(Response status)
+		{
 			((short)status).CopyTo(headerb, 6);
 			return this;
 		}
 
-		public Packet<T> Status(out Response status) {
+		public Packet<T> Status(out Response status)
+		{
 			status = (Response)headerb.GetInt16(6);
 			return this;
 		}
 
-		public Packet<T> Opaque(int opaque) {
+		public Packet<T> Opaque(int opaque)
+		{
 			opaque.CopyTo(headerb, 12);
 			return this;
 		}
 
-		public Packet<T> Opaque(out int opaque) {
+		public Packet<T> Opaque(out int opaque)
+		{
 			opaque = headerb.GetInt32(12);
 			return this;
 		}
 
-		public Packet<T> CAS(long cas) {
+		public Packet<T> CAS(long cas)
+		{
 			cas.CopyTo(headerb, 16);
 			return this;
 		}
 
-		public Packet<T> CAS(out long cas) {
+		public Packet<T> CAS(out long cas)
+		{
 			cas = headerb.GetInt64(16);
 			return this;
 		}
 
-		public Packet<T> Extras(byte[] extras) {
+		public Packet<T> Extras(byte[] extras)
+		{
 			extrasb = extras;
 			ExtraLength(Convert.ToInt16(extras.Length));
 			return this;
 		}
 
-		public Packet<T> Extras(byte[] returnb, int index, short length) {
+		public Packet<T> Extras(byte[] returnb, int index, short length)
+		{
 			extrasb = new byte[length];
 			Array.Copy(returnb, index, extrasb, 0, length);
 			return this;
 		}
 
-		public Packet<T> Extras(out byte[] extras) {
+		public Packet<T> Extras(out byte[] extras)
+		{
 			extras = extrasb;
 			return this;
 		}
 
-		public Packet<T> Key(string key) {
+		public Packet<T> Key(string key)
+		{
 			keyb = Encoding.UTF8.GetBytes(key);
 			KeyLength(Convert.ToInt16(key.Length));
 			return this;
 		}
 
-		public Packet<T> Key(byte[] returnb, int index, short length) {
-			try {
-				keyb = new byte[length];
-				Array.Copy(returnb, index, keyb, 0, length);
-			} catch {
-				throw;
-			}
-
+		public Packet<T> Key(byte[] returnb, int index, short length)
+		{
+			keyb = new byte[length];
+			Array.Copy(returnb, index, keyb, 0, length);
 			return this;
 		}
 
-		public Packet<T> Key(out string key) {
+		public Packet<T> Key(out string key)
+		{
 			key = Encoding.UTF8.GetString(keyb);
 			return this;
 		}
 
-		public Packet<T> Value(T value) {
+		public Packet<T> Value(T value)
+		{
 			valueT = value;
 			hasval = true;
 			return this;
 		}
 
-		public Packet<T> Value(byte[] returnb, int index, int length) {
-			try {
-				valb = new byte[length];
-				Array.Copy(returnb, index, valb, 0, length);
-				hasval = true;
-			} catch (Exception ex) {
-				throw ex;
-			}
+		public Packet<T> Value(byte[] returnb, int index, int length)
+		{
+			valb = new byte[length];
+			Array.Copy(returnb, index, valb, 0, length);
+			hasval = true;
 			return this;
 		}
 
-		public Packet<T> Value(bool hasValue) {
+		public Packet<T> Value(bool hasValue)
+		{
 			//some memcached protocol commands like incr MUST have no value, not even a 0, problematic for value-types;
 			hasval = hasValue;
 			return this;
 		}
 
-		public Packet<T> Value(out T value) {
+		public Packet<T> Value(out T value)
+		{
 			value = valueT;
 			return this;
 		}
 
-		public Packet<T> Header(byte[] returnb) {
+		public Packet<T> Header(byte[] returnb)
+		{
 			Array.Copy(returnb, 0, headerb, 0, 24);
 			return this;
 		}
 
 		#endregion
-
-		public T Value() {
+		public T Value()
+		{
 			Response status;
 			string key;
 			Op op;
@@ -175,7 +194,8 @@ namespace Ketchup.Protocol {
 
 			var vals = Encoding.UTF8.GetString(valb);
 
-			switch (status) {
+			switch (status)
+			{
 				case Response.NoError:
 					valueT = valb.GetObject<T>();
 					return valueT;
@@ -217,7 +237,8 @@ namespace Ketchup.Protocol {
 
 		}
 
-		public byte[] Serialize() {
+		public byte[] Serialize()
+		{
 			var valueb = hasval ? valueT.GetBytes() : new byte[0];
 			TotalLength(extrasb.Length + keyb.Length + valueb.Length);
 
@@ -230,7 +251,8 @@ namespace Ketchup.Protocol {
 			return result.ToArray();
 		}
 
-		public T Deserialize(byte[] returnb) {
+		public T Deserialize(byte[] returnb)
+		{
 			//create a new packet object with the same type T to house the response:
 			short extral;
 			short keyl;
@@ -247,32 +269,38 @@ namespace Ketchup.Protocol {
 				.Value();
 		}
 
-		private void KeyLength(short length) {
+		private void KeyLength(short length)
+		{
 			length.CopyTo(headerb, 2);
 			return;
 		}
 
-		private Packet<T> KeyLength(out short length) {
+		private Packet<T> KeyLength(out short length)
+		{
 			length = headerb.GetInt16(2);
 			return this;
 		}
 
-		private void ExtraLength(short length) {
+		private void ExtraLength(short length)
+		{
 			length.CopyTo(headerb, 4, 1);
 			return;
 		}
 
-		private Packet<T> ExtraLength(out short length) {
+		private Packet<T> ExtraLength(out short length)
+		{
 			length = Convert.ToInt16(headerb[4]);
 			return this;
 		}
 
-		private void TotalLength(int length) {
+		private void TotalLength(int length)
+		{
 			length.CopyTo(headerb, 8);
 			return;
 		}
 
-		private Packet<T> TotalLength(out int length) {
+		private Packet<T> TotalLength(out int length)
+		{
 			length = headerb.GetInt32(8);
 			return this;
 		}
