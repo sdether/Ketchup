@@ -8,7 +8,13 @@ namespace Ketchup.Protocol.Operations
 {
 	public class Processor
 	{
+		private readonly object _sync = new object();
+
+		public bool Started { get; set; }
 		public Node Node { get; private set; }
+		public ConcurrentQueue<Operation> WriteQueue = new ConcurrentQueue<Operation>();
+		public ConcurrentQueue<Operation> ReadQueue = new ConcurrentQueue<Operation>();
+		public ConcurrentQueue<Operation> ProcessQueue = new ConcurrentQueue<Operation>();
 
 		public Processor(Node node)
 		{
@@ -17,33 +23,39 @@ namespace Ketchup.Protocol.Operations
 
 		public void Start()
 		{
-			var thread = new Thread(state =>
+			lock (_sync)
 			{
-				while (true)
+				if (Started) return;
+
+				var thread = new Thread(state =>
 				{
-					var processor = (Processor)state;
+					while (true)
+					{
+						var processor = (Processor)state;
 
-					//if there's nothing in the queue to send skip Send
-					if (!processor.Node.WriteQueue.IsEmpty)
-						processor.Send();
+						//if there's nothing in the queue to send skip Send
+						if (!processor.WriteQueue.IsEmpty)
+							processor.Send();
 
-					//likewise, skip Receive if nothing in the queue
-					if (!processor.Node.ReadQueue.IsEmpty)
-						processor.Receive();
+						//likewise, skip Receive if nothing in the queue
+						if (!processor.ReadQueue.IsEmpty)
+							processor.Receive();
 
-					//process any data that is in the Process queue
-					if (!processor.Node.ProcessQueue.IsEmpty)
-						processor.Process();
-				}
+						//process any data that is in the Process queue
+						if (!processor.ProcessQueue.IsEmpty)
+							processor.Process();
+					}
 
-			});
-			thread.Start(this);
+				});
+				thread.Start(this);
+				Started = true;
+			}
 		}
 
 		public void Send()
 		{
 			//pull enough operations out of the queue to fill the buffer
-			var sbuffer = Buffer.Fill(Node.WriteQueue, Node.ReadQueue);
+			var sbuffer = Buffer.Fill(WriteQueue, ReadQueue);
 			var sstate = new SendState
 			{
 				Socket = Node.NodeSocket
@@ -71,10 +83,10 @@ namespace Ketchup.Protocol.Operations
 			);
 		}
 
-		public void Process() 
+		public void Process()
 		{
 			Operation op;
-			if (!Node.ProcessQueue.TryDequeue(out op)) return;
+			if (!ProcessQueue.TryDequeue(out op)) return;
 			op.Process(op.Response, op.State);
 		}
 
@@ -91,8 +103,8 @@ namespace Ketchup.Protocol.Operations
 			var remote = state.Socket;
 			remote.EndReceive(asyncResult);
 
-			var readQueue = state.Processor.Node.ReadQueue;
-			var processQueue = state.Processor.Node.ProcessQueue;
+			var readQueue = state.Processor.ReadQueue;
+			var processQueue = state.Processor.ProcessQueue;
 			Buffer.Drain(state.ReceiveBuffer, readQueue, processQueue);
 		}
 

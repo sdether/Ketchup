@@ -11,6 +11,7 @@ namespace Ketchup
 	public class Node
 	{
 		private readonly object _sync = new object();
+		private readonly Processor _processor;
 		private Socket _nodeSocket;
 
 		public int Port { get; set; }
@@ -19,9 +20,6 @@ namespace Ketchup
 		public string Host { get; set; }
 		public DateTime DeadAt { get; set; }
 		public DateTime LastConnectionFailure { get; set; }
-		public ConcurrentQueue<Operation> WriteQueue = new ConcurrentQueue<Operation>();
-		public ConcurrentQueue<Operation> ReadQueue = new ConcurrentQueue<Operation>();
-		public ConcurrentQueue<Operation> ProcessQueue = new ConcurrentQueue<Operation>();
 
 		public string Id
 		{
@@ -47,10 +45,9 @@ namespace Ketchup
 			CurrentRetryCount = -1;
 			DeadAt = DateTime.MinValue;
 			LastConnectionFailure = DateTime.MinValue;
-			
-			//start processing operations
-			var processor = new Processor(this);
-			processor.Start();
+
+			_processor = new Processor(this);
+			_processor.Start();
 		}
 
 		public Node(string host, int port)
@@ -72,7 +69,7 @@ namespace Ketchup
 			};
 
 			//the operation is picked up by a different thread later which deals with the packets
-			WriteQueue.Enqueue(op);
+			_processor.WriteQueue.Enqueue(op);
 			//Thread.Sleep(20);
 		}
 
