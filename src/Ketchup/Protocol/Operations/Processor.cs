@@ -16,6 +16,7 @@ namespace Ketchup.Protocol.Operations
 		public ConcurrentQueue<Operation> WriteQueue = new ConcurrentQueue<Operation>();
 		public ConcurrentQueue<Operation> ReadQueue = new ConcurrentQueue<Operation>();
 		public ConcurrentQueue<Operation> ProcessQueue = new ConcurrentQueue<Operation>();
+		public ManualResetEvent Handle = new ManualResetEvent(true);
 		public List<byte> ReadBuffer = new List<byte>();
 
 		public Processor(Node node)
@@ -32,39 +33,49 @@ namespace Ketchup.Protocol.Operations
 				var thread = new Thread(state =>
 				{
 					var processor = (Processor)state;
+					var socket = processor.Node.NodeSocket;
 
 					while (true)
 					{
+						if(processor.WriteQueue.IsEmpty && processor.ReadBuffer.Count == 0)
+							Handle.WaitOne();
+
 						//if there's nothing in the queue to send skip Send
 						if (!processor.WriteQueue.IsEmpty)
-							processor.Send();
+							processor.Send(socket);
 
 						//likewise, skip Receive if nothing in the queue
-						if (!processor.ReadQueue.IsEmpty)
-							processor.Receive();
+						//if (!processor.ReadQueue.IsEmpty)
+						//    processor.Receive();
 
 						//drain any data received from the socket
 						if (processor.ReadBuffer.Count > 0)
 							processor.Drain();
 
-						//process any data that is in the Process queue
-						if (!processor.ProcessQueue.IsEmpty)
-							processor.Process();
-					}
+						////process any data that is in the Process queue
+						//if (!processor.ProcessQueue.IsEmpty)
+						//    processor.Process();
 
-				});
+						if (!processor.WriteQueue.IsEmpty || processor.ReadBuffer.Count != 0) continue;
+					}
+				}) {IsBackground = true, Name = "Ketchup.Processsor"};
 				thread.Start(this);
 				Started = true;
 			}
 		}
 
-		public void Send()
+		public void Enqueue(Operation op) {
+			WriteQueue.Enqueue(op);
+			Handle.Set();
+		}
+
+		public void Send(Socket socket)
 		{
 			//pull enough operations out of the queue to fill the buffer
-			var sbuffer = Buffer.Fill(WriteQueue, ReadQueue);
+			var sbuffer = Buffer.FillOne(WriteQueue, ReadQueue);
 
 			//process thread loop handles async, not socket
-			//Node.NodeSocket.Send(sbuffer);
+			//socket.Send(sbuffer);
 
 			var sstate = new SendState
 			{
@@ -75,18 +86,21 @@ namespace Ketchup.Protocol.Operations
 				sbuffer, 0, sbuffer.Length,
 				SocketFlags.None, SendData, sstate
 			);
+
+			Receive(socket);
 		}
 
-		public void Receive()
+		public void Receive(Socket socket)
 		{
 			var rbuffer = Buffer.GetReceiveBuffer();
-			//var read = Node.NodeSocket.Receive(rbuffer);
+			//var read = socket.Receive(rbuffer);
 			//ReadBuffer.AddRange(rbuffer.Take(read));
+			//if (read == 1024) Receive(socket);
 
 			var rstate = new ReceiveState
 			{
 				Processor = this,
-				Socket = Node.NodeSocket,
+				Socket = socket,
 				ReceiveBuffer = Buffer.GetReceiveBuffer(),
 			};
 

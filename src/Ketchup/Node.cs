@@ -69,7 +69,7 @@ namespace Ketchup
 			};
 
 			//the operation is picked up by a different thread later which deals with the packets
-			_processor.WriteQueue.Enqueue(op);
+			_processor.Enqueue(op);
 			//Thread.Sleep(20);
 		}
 

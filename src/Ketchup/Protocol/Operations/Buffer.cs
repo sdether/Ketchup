@@ -39,7 +39,9 @@ namespace Ketchup.Protocol.Operations
 					op.Response = buffer.Take(responseLength).ToArray();
 
 					//add the response back to the ProcessQueue to be handled by the Processor thread
-					processQueue.Enqueue(op);
+					//processQueue.Enqueue(op);
+
+					op.Process(op.Response, op.State);
 				}
 				catch (Exception ex)
 				{
@@ -58,6 +60,15 @@ namespace Ketchup.Protocol.Operations
 			fill.CopyTo(buffer, 0);
 			return buffer;
 		}
+
+		public static byte[] FillOne(ConcurrentQueue<Operation> writeQueue, ConcurrentQueue<Operation> readQueue)
+		{
+			Operation op;
+			if (!writeQueue.TryDequeue(out op)) return new byte[0];
+			readQueue.Enqueue(op);
+			return op.Packet;
+		}
+
 
 		private static List<byte> Fill(List<byte> buffer, ConcurrentQueue<Operation> writeQueue, ConcurrentQueue<Operation> readQueue)
 		{

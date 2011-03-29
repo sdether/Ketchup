@@ -2,21 +2,28 @@
 using System.Collections.Generic;
 using System.Configuration;
 
-namespace Ketchup.Config {
-	public class KetchupConfig {
+namespace Ketchup.Config
+{
+	public class KetchupConfig
+	{
+		private static readonly object _sync = new object();
 		private NodeList nodes;
 		private IDictionary<string, IList<Node>> bucketNodes;
 		private static KetchupConfig current;
 		private readonly IDictionary<string, Bucket> buckets = new Dictionary<string, Bucket>();
 		private readonly IList<string> configNodes = new List<string>();
 
-		public static KetchupConfig Current {
+		public static KetchupConfig Current
+		{
 			get
 			{
-				if (current == null && KetchupConfigSection.Current == null)
-					throw new ConfigurationErrorsException("Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file." );
+				lock (_sync)
+				{
+					if (current == null && KetchupConfigSection.Current == null)
+						throw new ConfigurationErrorsException("Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file.");
 
-				return current ?? (current = KetchupConfigSection.Current.ToKetchupConfig().Init());
+					return current ?? (current = KetchupConfigSection.Current.ToKetchupConfig().Init());
+				}
 			}
 		}
 
@@ -59,65 +66,77 @@ namespace Ketchup.Config {
 
 		#endregion
 
-		public KetchupConfig() {
+		public KetchupConfig()
+		{
 			Compression = true;
 			Failover = false;
-			ConnectionRetryDelay = new TimeSpan(0,0,0,0,100);
+			ConnectionRetryDelay = new TimeSpan(0, 0, 0, 0, 100);
 			ConnectionRetryCount = 2;
-			ConnectionTimeout = new TimeSpan(0,0,0,0,500);
-			DeadNodeRetryDelay = new TimeSpan(0,0,1);
+			ConnectionTimeout = new TimeSpan(0, 0, 0, 0, 500);
+			DeadNodeRetryDelay = new TimeSpan(0, 0, 1);
 			HashingAlgorithm = HashingAlgortihm.Default;
 		}
 
-		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true) {
-			return AddBucket(new Bucket {
+		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)
+		{
+			return AddBucket(new Bucket
+			{
 				Name = name,
 				Port = port,
 				Prefix = prefix
 			});
 		}
 
-		public KetchupConfig AddBucket(Bucket bucket) {
+		public KetchupConfig AddBucket(Bucket bucket)
+		{
 			buckets.Add(bucket.Name, bucket);
 			return this;
 		}
 
 
-		public KetchupConfig AddNode(string endPoint) {
+		public KetchupConfig AddNode(string endPoint)
+		{
 			configNodes.Add(endPoint);
 			return this;
 		}
 
-		public Node GetNode(string address) {
+		public Node GetNode(string address)
+		{
 			var node = nodes.GetById(address);
-			if(node == null)
+			if (node == null)
 				throw new Exception("Host and port specified are not a valid node in the Ketchup Config");
 
 			return node;
 		}
 
-		public IList<Node> GetNodes(string bucket) {
+		public IList<Node> GetNodes(string bucket)
+		{
 			return bucketNodes[bucket];
 		}
 
-		public string GetPrefixKey(string key, string bucket) {
+		public string GetPrefixKey(string key, string bucket)
+		{
 			return buckets[bucket].Prefix ? bucket + "-" + key : key;
 		}
 
-		public string GetOriginalKey(string key, string bucket) {
+		public string GetOriginalKey(string key, string bucket)
+		{
 			return buckets[bucket].Prefix ? key.Substring(bucket.Length + 1) : key;
 		}
 
-		public static KetchupConfig Init(KetchupConfig config) {
+		public static KetchupConfig Init(KetchupConfig config)
+		{
 			config.Init();
 			return config;
 		}
 
-		internal KetchupConfig Init() {
+		internal KetchupConfig Init()
+		{
 			bucketNodes = new Dictionary<string, IList<Node>>();
 			nodes = new NodeList();
 
-			foreach(var bucket in buckets.Values){
+			foreach (var bucket in buckets.Values)
+			{
 				/* there are 3 options for buckets: nodes defined, port defined, all endpoints
 				 * there are 2 options for nodes: ip defined, ip+port defined
 				 */
@@ -126,13 +145,15 @@ namespace Ketchup.Config {
 				bucketNodes.Add(bucket.Name, new List<Node>());
 
 				//option 1: nodes are defined, if port is defined, use port, otherwise use default port
-				if (bucket.ConfigNodes.Count > 0) {
+				if (bucket.ConfigNodes.Count > 0)
+				{
 					InitSpecifiedNodes(bucket);
 					continue;
 				}
 
 				//option 2: port is defined in the bucket list, use port with ips in node list
-				if (bucket.Port > 0) {
+				if (bucket.Port > 0)
+				{
 					InitPortNodes(bucket);
 					continue;
 				}
@@ -144,8 +165,10 @@ namespace Ketchup.Config {
 			return this;
 		}
 
-		private void InitPortNodes(Bucket bucket) {
-			foreach (var cn in configNodes) {
+		private void InitPortNodes(Bucket bucket)
+		{
+			foreach (var cn in configNodes)
+			{
 				var host = cn.Split(':')[0];
 				bucketNodes[bucket.Name].Add(
 					nodes.GetOrCreate(host + ":" + bucket.Port)
@@ -153,12 +176,14 @@ namespace Ketchup.Config {
 			}
 		}
 
-		private void InitAllNodes(Bucket bucket) {
+		private void InitAllNodes(Bucket bucket)
+		{
 			foreach (var cn in configNodes)
 				bucketNodes[bucket.Name].Add(nodes.GetOrCreate(cn));
 		}
 
-		private void InitSpecifiedNodes(Bucket bucket) {
+		private void InitSpecifiedNodes(Bucket bucket)
+		{
 			foreach (var ep in bucket.ConfigNodes)
 				bucketNodes[bucket.Name].Add(
 					nodes.GetOrCreate(ep)
