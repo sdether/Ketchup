@@ -62,30 +62,38 @@ namespace Ketchup.Protocol.Operations
 		{
 			//pull enough operations out of the queue to fill the buffer
 			var sbuffer = Buffer.Fill(WriteQueue, ReadQueue);
-			var sstate = new SendState
-			{
-				Socket = Node.NodeSocket
-			};
 
-			sstate.Socket.BeginSend(
-				sbuffer, 0, sbuffer.Length,
-				SocketFlags.None, SendData, sstate
-			);
+			//process thread loop handles async, not socket
+			Node.NodeSocket.Send(sbuffer);
+
+			//var sstate = new SendState
+			//{
+			//    Socket = Node.NodeSocket
+			//};
+
+			//sstate.Socket.BeginSend(
+			//    sbuffer, 0, sbuffer.Length,
+			//    SocketFlags.None, SendData, sstate
+			//);
 		}
 
 		public void Receive()
 		{
-			var rstate = new ReceiveState
-			{
-				Processor = this,
-				Socket = Node.NodeSocket,
-				ReceiveBuffer = Buffer.GetReceiveBuffer(),
-			};
+			var rbuffer = Buffer.GetReceiveBuffer();
+			var read = Node.NodeSocket.Receive(rbuffer);
+			ReadBuffer.AddRange(rbuffer.Take(read));
 
-			rstate.Socket.BeginReceive(
-				rstate.ReceiveBuffer, 0, rstate.ReceiveBuffer.Length,
-				SocketFlags.None, ReceiveData, rstate
-			);
+			//var rstate = new ReceiveState
+			//{
+			//    Processor = this,
+			//    Socket = Node.NodeSocket,
+			//    ReceiveBuffer = Buffer.GetReceiveBuffer(),
+			//};
+
+			//rstate.Socket.BeginReceive(
+			//    rstate.ReceiveBuffer, 0, rstate.ReceiveBuffer.Length,
+			//    SocketFlags.None, ReceiveData, rstate
+			//);
 		}
 
 		public void Drain()
