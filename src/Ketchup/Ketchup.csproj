@@ -49,8 +49,7 @@
     <Compile Include="Protocol\Commands\SetAddReplaceCommand.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Protocol\Operations\Buffer.cs" />
-    <Compile Include="Protocol\Operations\Operation.cs" />
+    <Compile Include="Operation.cs" />
     <Compile Include="Protocol\Packet.cs" />
     <Compile Include="Protocol\Enums.cs" />
     <Compile Include="Node.cs" />
@@ -61,12 +60,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Async\GetExtensions.cs" />
     <Compile Include="Hashing\Hasher.cs" />
-    <Compile Include="Protocol\PacketExtensions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Protocol\Exceptions\ProtocolExceptions.cs" />
     <Compile Include="Protocol\Commands\GetCommand.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Protocol\Operations\Processor.cs" />
+    <Compile Include="EventLoop.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -6,26 +6,12 @@ namespace Ketchup.Config
 {
 	public class KetchupConfig
 	{
-		private static readonly object _sync = new object();
-		private NodeList nodes;
-		private IDictionary<string, IList<Node>> bucketNodes;
-		private static KetchupConfig current;
 		private readonly IDictionary<string, Bucket> buckets = new Dictionary<string, Bucket>();
+		private readonly IDictionary<string, IList<Node>> bucketNodes = new Dictionary<string, IList<Node>>();
 		private readonly IList<string> configNodes = new List<string>();
+		private readonly NodeList nodes = new NodeList();
 
-		public static KetchupConfig Current
-		{
-			get
-			{
-				lock (_sync)
-				{
-					if (current == null && KetchupConfigSection.Current == null)
-						throw new ConfigurationErrorsException("Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file.");
-
-					return current ?? (current = KetchupConfigSection.Current.ToKetchupConfig().Init());
-				}
-			}
-		}
+		public static KetchupConfig Current { get; private set; }		
 
 		#region settings
 
@@ -132,9 +118,6 @@ namespace Ketchup.Config
 
 		internal KetchupConfig Init()
 		{
-			bucketNodes = new Dictionary<string, IList<Node>>();
-			nodes = new NodeList();
-
 			foreach (var bucket in buckets.Values)
 			{
 				/* there are 3 options for buckets: nodes defined, port defined, all endpoints
@@ -154,18 +137,18 @@ namespace Ketchup.Config
 				//option 2: port is defined in the bucket list, use port with ips in node list
 				if (bucket.Port > 0)
 				{
-					InitPortNodes(bucket);
+					InitPortNodes(bucket, configNodes);
 					continue;
 				}
 
-				InitAllNodes(bucket);
+				InitAllNodes(bucket, configNodes);
 			}
 
-			current = this;
+			Current = this;
 			return this;
 		}
 
-		private void InitPortNodes(Bucket bucket)
+		private void InitPortNodes(Bucket bucket, IEnumerable<string> configNodes)
 		{
 			foreach (var cn in configNodes)
 			{
@@ -176,7 +159,7 @@ namespace Ketchup.Config
 			}
 		}
 
-		private void InitAllNodes(Bucket bucket)
+		private void InitAllNodes(Bucket bucket, IEnumerable<string> configNodes)
 		{
 			foreach (var cn in configNodes)
 				bucketNodes[bucket.Name].Add(nodes.GetOrCreate(cn));

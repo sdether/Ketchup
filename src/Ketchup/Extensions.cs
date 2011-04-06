@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace Ketchup.Protocol {
-	public static class PacketExtensions {
+namespace Ketchup {
+	public static class Extensions {
 
 		public static byte[] CopyTo(this short value, byte[] destination, int index, int length = 2) {
 			var source = BitConverter.GetBytes(value);
@@ -177,6 +178,18 @@ namespace Ketchup.Protocol {
 			}
 
 			return (T)obj;
+		}
+
+		public static byte[] ToByteArray(this IEnumerable<byte[]> list, int size)
+		{
+			var bytes = new byte[size];
+			var index = 0;
+			foreach (var listb in list) {
+				var left = size - index;
+				var length = left < listb.Length ? left : listb.Length;
+				Array.Copy(listb, 0, bytes, index, length);
+			}
+			return bytes;
 		}
 	}
 }

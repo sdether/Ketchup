@@ -10,30 +10,32 @@ namespace Ketchup.Protocol.Commands
 
 		public KetchupClient Client { get; set; }
 		public string Key { get; set; }
+		public string Bucket { get; set; }
 		public T Value { get; set; }
 		public int Expiration { get; set; }
 		public object State { get; set; }
 		public Action<object> Success { get; set; }
 		public Action<Exception, object> Error { get; set; }
 
-		public SetAddReplaceCommand(string key, T value)
+		public SetAddReplaceCommand(KetchupClient client, string key, string bucket, T value)
 		{
+			Client = client;
 			Key = key;
 			Value = value;
+			Bucket = bucket;
 		}
 
 		public KetchupClient SetAddReplace(Op operation)
 		{
 			var extras = new byte[8];
 			Expiration.CopyTo(extras, 4);
-			var packet = new Packet<T>(operation, config.GetPrefixKey(Key, Client.Bucket)).Extras(extras).Value(Value);
-			Hasher.GetNode(Key, Client.Bucket).Request(packet.Serialize(), Process, Error, this);
-			return Client;
+			var packet = new Packet<T>(operation, config.GetPrefixKey(Key, Bucket)).Extras(extras).Value(Value).Serialize();
+			return Client.Queue(new Operation(packet, Key, Bucket, Process, Error, this));
 		}
 
-		public static void Process(byte[] response, object Operation)
+		public static void Process(byte[] response, object state)
 		{
-			var op = (SetAddReplaceCommand<T>)Operation;
+			var op = (SetAddReplaceCommand<T>)state;
 			try
 			{
 				new Packet<T>(response).Value();

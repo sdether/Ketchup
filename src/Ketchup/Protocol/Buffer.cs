@@ -2,9 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Ketchup.Protocol;
+using Ketchup.Protocol.Operations;
 
-namespace Ketchup.Protocol.Operations
+namespace Ketchup
 {
 	public static class Buffer
 	{

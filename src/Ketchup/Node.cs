@@ -4,14 +4,13 @@ using System.Configuration;
 using System.Net.Sockets;
 using Ketchup.Config;
 using System.Collections.Generic;
-using Ketchup.Protocol.Operations;
 
 namespace Ketchup
 {
 	public class Node
 	{
 		private readonly object _sync = new object();
-		private readonly Processor _processor;
+		private readonly EventLoop _processor;
 		private Socket _nodeSocket;
 
 		public int Port { get; set; }
@@ -45,9 +44,6 @@ namespace Ketchup
 			CurrentRetryCount = -1;
 			DeadAt = DateTime.MinValue;
 			LastConnectionFailure = DateTime.MinValue;
-
-			_processor = new Processor(this);
-			_processor.Start();
 		}
 
 		public Node(string host, int port)
@@ -55,22 +51,6 @@ namespace Ketchup
 		{
 			Host = host;
 			Port = port;
-		}
-
-		public void Request(byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)
-		{
-			var op = new Operation()
-			{
-				Error = error,
-				Process = process,
-				Packet = packet,
-				State = state,
-				Socket = NodeSocket,
-			};
-
-			//the operation is picked up by a different thread later which deals with the packets
-			_processor.Enqueue(op);
-			//Thread.Sleep(20);
 		}
 
 		private Socket Connect(Socket socket)

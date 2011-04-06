@@ -5,10 +5,10 @@ using Ketchup.Protocol.Commands;
 namespace Ketchup.Async
 {
 	public static class SetExtensions {
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value, int expiration,
-			Action<object> success, Action<Exception, object> error, object state) {
+		public static KetchupClient Set<T>(this KetchupClient client, string key, string bucket, 
+			T value, int expiration, Action<object> success, Action<Exception, object> error, object state) {
 
-			return new SetAddReplaceCommand<T>(key, value) {
+			return new SetAddReplaceCommand<T>(client, key, bucket, value) {
 				Client = client,
 				Key = key,
 				Expiration = expiration,
@@ -18,10 +18,10 @@ namespace Ketchup.Async
 			}.Set();
 		}
 
-		public static KetchupClient Set<T>(this KetchupClient client, string key, T value,
+		public static KetchupClient Set<T>(this KetchupClient client, string key, string bucket, T value,
 			Action<object> success, Action<Exception, object> error, object asyncState) {
 
-			return Set(client, key, value, 0, success, error, asyncState);
+			return Set(client, key, bucket, value, 0, success, error, asyncState);
 		}
 
 		//public static KetchupClient Set<T>(this KetchupClient client, string key, T value, TimeSpan expiration,
