@@ -1,6 +1,7 @@
 ﻿using System;
 using Ketchup.Config;
 using Ketchup.Hashing;
+using Ketchup.IO;
 using Ketchup.Protocol.Exceptions;
 
 namespace Ketchup.Protocol.Commands
@@ -27,7 +28,8 @@ namespace Ketchup.Protocol.Commands
 		{
 			var cmd = Miss == null ? Op.GetQ : Op.Get;
 			var packet = new Packet<T>(cmd, config.GetPrefixKey(Key, Bucket)).Serialize();
-			return Client.Queue(new Operation(packet, Key, Bucket, Process, Error, this));
+			var node = Hasher.GetNode(Key, Bucket);
+			return Client.QueueOperation(node, packet, Process, Error, this);
 		}
 
 		private static void Process(byte[] response, object command)

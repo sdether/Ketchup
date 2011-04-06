@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace Ketchup.Config
 {
@@ -50,6 +49,11 @@ namespace Ketchup.Config
 		/// </summary>
 		public HashingAlgortihm HashingAlgorithm { get; set; }
 
+		/// <summary>
+		/// The buffer used to receive bytes from the TCP socket, default is 1024
+		/// </summary>
+		public int BufferSize { get; set; }
+
 		#endregion
 
 		public KetchupConfig()
@@ -61,6 +65,7 @@ namespace Ketchup.Config
 			ConnectionTimeout = new TimeSpan(0, 0, 0, 0, 500);
 			DeadNodeRetryDelay = new TimeSpan(0, 0, 1);
 			HashingAlgorithm = HashingAlgortihm.Default;
+			BufferSize = 1024;
 		}
 
 		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)
@@ -148,9 +153,9 @@ namespace Ketchup.Config
 			return this;
 		}
 
-		private void InitPortNodes(Bucket bucket, IEnumerable<string> configNodes)
+		private void InitPortNodes(Bucket bucket, IEnumerable<string> nodestrings)
 		{
-			foreach (var cn in configNodes)
+			foreach (var cn in nodestrings)
 			{
 				var host = cn.Split(':')[0];
 				bucketNodes[bucket.Name].Add(
@@ -159,9 +164,9 @@ namespace Ketchup.Config
 			}
 		}
 
-		private void InitAllNodes(Bucket bucket, IEnumerable<string> configNodes)
+		private void InitAllNodes(Bucket bucket, IEnumerable<string> nodestrings)
 		{
-			foreach (var cn in configNodes)
+			foreach (var cn in nodestrings)
 				bucketNodes[bucket.Name].Add(nodes.GetOrCreate(cn));
 		}
 

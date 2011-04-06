@@ -1,6 +1,7 @@
 ﻿using System;
 using Ketchup.Config;
 using Ketchup.Hashing;
+using Ketchup.IO;
 
 namespace Ketchup.Protocol.Commands
 {
@@ -30,7 +31,8 @@ namespace Ketchup.Protocol.Commands
 			var extras = new byte[8];
 			Expiration.CopyTo(extras, 4);
 			var packet = new Packet<T>(operation, config.GetPrefixKey(Key, Bucket)).Extras(extras).Value(Value).Serialize();
-			return Client.Queue(new Operation(packet, Key, Bucket, Process, Error, this));
+			var node = Hasher.GetNode(Key, Bucket);
+			return Client.QueueOperation(node, packet, Process, Error, this);
 		}
 
 		public static void Process(byte[] response, object state)

@@ -94,7 +94,7 @@ namespace Ketchup.Protocol
 
 	internal class Packet<T>
 	{
-		private PacketHeader header;
+		private readonly PacketHeader header;
 		private bool hasval;
 		private byte[] extrasb = new byte[0];
 		private byte[] keyb = new byte[0];

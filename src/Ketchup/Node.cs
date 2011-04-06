@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Configuration;
 using System.Net.Sockets;
 using Ketchup.Config;
-using System.Collections.Generic;
+using Ketchup.IO;
 
 namespace Ketchup
 {
 	public class Node
 	{
 		private readonly object _sync = new object();
-		private readonly EventLoop _processor;
 		private Socket _nodeSocket;
 
 		public int Port { get; set; }

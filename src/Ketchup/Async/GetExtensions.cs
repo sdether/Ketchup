@@ -1,5 +1,4 @@
 ﻿using System;
-using Ketchup.Protocol;
 using Ketchup.Protocol.Commands;
 
 namespace Ketchup.Async

@@ -1,6 +1,7 @@
-﻿using System.Configuration;
-using System.Threading;
+﻿using System;
+using System.Configuration;
 using Ketchup.Config;
+using Ketchup.IO;
 
 namespace Ketchup {
 
@@ -12,28 +13,21 @@ namespace Ketchup {
 		{
 			var config = GetConfig();
 			KetchupConfig.Init(config);
-			StartThread();
+			loop.Start();
 		}
 
 		public KetchupClient(KetchupConfig config) 
 		{
 			KetchupConfig.Init(config);
-			StartThread();
+			loop.Start();
 		}
 
-		public KetchupClient Queue(Operation op) {
+		public KetchupClient QueueOperation(Node node, byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)
+		{
+			var op = new Operation(packet, node.NodeSocket, process, error, state);
 			loop.QueueSend(op);
 			return this;
 		}
-		
-		private void StartThread() {
-			new Thread(EventLoop.Run) {
-				IsBackground = true,
-				Name = "KetchupClient.EventLoop"
-			}.Start(loop);
-		}
-
-		
 
 		private static KetchupConfig GetConfig()
 		{
@@ -43,9 +37,5 @@ namespace Ketchup {
 
 			return configSection.ToKetchupConfig();
 		}
-
-		
-
-
 	}
 }
