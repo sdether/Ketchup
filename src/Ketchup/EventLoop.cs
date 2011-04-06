@@ -36,8 +36,7 @@ namespace Ketchup
 		private void WaitIfEmpty() 
 		{
 			_handle.Reset();
-			if (_processQueue.IsEmpty && _sendQueue.IsEmpty)
-				_handle.Wait();
+			if (_processQueue.IsEmpty && _sendQueue.IsEmpty) _handle.Wait();
 		}
 
 		private void Process()
