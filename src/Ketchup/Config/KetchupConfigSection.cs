@@ -104,7 +104,7 @@ namespace Ketchup.Config {
 				}
 			}
 
-			return config.Init();
+			return config;
 		}
 	}
 

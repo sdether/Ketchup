@@ -1,31 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace Ketchup.Config
 {
 	public class KetchupConfig
 	{
-		private static readonly object _sync = new object();
-		private NodeList nodes;
-		private IDictionary<string, IList<Node>> bucketNodes;
-		private static KetchupConfig current;
 		private readonly IDictionary<string, Bucket> buckets = new Dictionary<string, Bucket>();
+		private readonly IDictionary<string, IList<Node>> bucketNodes = new Dictionary<string, IList<Node>>();
 		private readonly IList<string> configNodes = new List<string>();
+		private readonly NodeList nodes = new NodeList();
 
-		public static KetchupConfig Current
-		{
-			get
-			{
-				lock (_sync)
-				{
-					if (current == null && KetchupConfigSection.Current == null)
-						throw new ConfigurationErrorsException("Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file.");
-
-					return current ?? (current = KetchupConfigSection.Current.ToKetchupConfig().Init());
-				}
-			}
-		}
+		public static KetchupConfig Current { get; private set; }		
 
 		#region settings
 
@@ -64,6 +49,22 @@ namespace Ketchup.Config
 		/// </summary>
 		public HashingAlgortihm HashingAlgorithm { get; set; }
 
+		/// <summary>
+		/// The buffer used to receive bytes from the TCP socket, default is 1024
+		/// </summary>
+		public int BufferSize { get; set; }
+
+		/// <summary>
+		/// The maximum number of sockets that can be created in the Socket Pool, default is 10
+		/// </summary>
+		public int MaxPooledSockets { get; set; }
+
+		/// <summary>
+		/// The number of seconds to wait to acquire a socket from the Pool, default is 5
+		/// </summary>
+		public int MaxPooledSocketWait { get; set; }
+
+
 		#endregion
 
 		public KetchupConfig()
@@ -75,6 +76,9 @@ namespace Ketchup.Config
 			ConnectionTimeout = new TimeSpan(0, 0, 0, 0, 500);
 			DeadNodeRetryDelay = new TimeSpan(0, 0, 1);
 			HashingAlgorithm = HashingAlgortihm.Default;
+			BufferSize = 1024;
+			MaxPooledSockets = 10;
+			MaxPooledSocketWait = 5;
 		}
 
 		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)
@@ -132,9 +136,6 @@ namespace Ketchup.Config
 
 		internal KetchupConfig Init()
 		{
-			bucketNodes = new Dictionary<string, IList<Node>>();
-			nodes = new NodeList();
-
 			foreach (var bucket in buckets.Values)
 			{
 				/* there are 3 options for buckets: nodes defined, port defined, all endpoints
@@ -154,20 +155,20 @@ namespace Ketchup.Config
 				//option 2: port is defined in the bucket list, use port with ips in node list
 				if (bucket.Port > 0)
 				{
-					InitPortNodes(bucket);
+					InitPortNodes(bucket, configNodes);
 					continue;
 				}
 
-				InitAllNodes(bucket);
+				InitAllNodes(bucket, configNodes);
 			}
 
-			current = this;
+			Current = this;
 			return this;
 		}
 
-		private void InitPortNodes(Bucket bucket)
+		private void InitPortNodes(Bucket bucket, IEnumerable<string> nodestrings)
 		{
-			foreach (var cn in configNodes)
+			foreach (var cn in nodestrings)
 			{
 				var host = cn.Split(':')[0];
 				bucketNodes[bucket.Name].Add(
@@ -176,9 +177,9 @@ namespace Ketchup.Config
 			}
 		}
 
-		private void InitAllNodes(Bucket bucket)
+		private void InitAllNodes(Bucket bucket, IEnumerable<string> nodestrings)
 		{
-			foreach (var cn in configNodes)
+			foreach (var cn in nodestrings)
 				bucketNodes[bucket.Name].Add(nodes.GetOrCreate(cn));
 		}
 

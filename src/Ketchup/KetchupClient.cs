@@ -1,71 +1,41 @@
-﻿using Ketchup.Config;
+﻿using System;
+using System.Configuration;
+using Ketchup.Config;
+using Ketchup.IO;
 
 namespace Ketchup {
-	public class KetchupClient {
 
-		public string Bucket { get; set; }
+	public class KetchupClient 
+	{
+		private readonly EventLoop loop = new EventLoop();
 
-		/// <summary>
-		/// Creates a new instance of the ketchup client with no configuration
-		/// </summary>
-		public KetchupClient() {
-			Bucket = "default";
-		}
-
-		public KetchupClient(string bucket) {
-			Bucket = bucket;
-		}
-
-		public KetchupClient(KetchupConfig config, string bucket) {
+		public KetchupClient() 
+		{
+			var config = GetConfig();
 			KetchupConfig.Init(config);
-			Bucket = bucket;
+			loop.Start();
 		}
 
-		//public KetchupClient Get<T>(string key, Action<T> success, Action<Exception> error) {
-		//    try {
-		//        //Protocol.Get(key, success);
-		//    } catch (Exception ex) {
-		//        error(ex);
-		//    }
+		public KetchupClient(KetchupConfig config) 
+		{
+			KetchupConfig.Init(config);
+			loop.Start();
+		}
 
-		//    return this;
-		//}
+		public KetchupClient QueueOperation(Node node, byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)
+		{
+			var op = new Operation(packet, node, process, error, state);
+			loop.QueueSend(op);
+			return this;
+		}
 
-		//public KetchupClient Get(string key, Action<ArraySegment<byte>> success, Action<Exception> error) {
-		//    throw new NotImplementedException();
-		//}
+		private static KetchupConfig GetConfig()
+		{
+			var configSection = KetchupConfigSection.Current;
+			if (configSection == null) throw new ConfigurationErrorsException(
+				"Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file.");
 
-		//public T Get<T>(string key)	{
-		//    throw new NotImplementedException();
-		//}
-
-		//public object Get(string key){
-		//    throw new NotImplementedException();
-		//}
-
-		//public KetchupClient Set<T>(string key, T value, DateTime expires,
-		//    Action success,
-		//    Action<Exception> error) {
-		//    throw new NotImplementedException();
-		//}
-
-		//public KetchupClient Set(string key, ArraySegment<byte> data, DateTime expires,
-		//    Action success,
-		//    Action<Exception> error
-		//    ) {
-		//    throw new NotImplementedException();
-		//}
-
-		//public KetchupClient Set(string key, ArraySegment<byte> data) {
-		//    throw new NotImplementedException();
-		//}
-
-		//public KetchupClient Set<T>(string key, T data) {
-		//    throw new NotImplementedException();
-		//}
-
-		//public KetchupClient Set(string key, object data) {
-		//    throw new NotImplementedException();
-		//}
+			return configSection.ToKetchupConfig();
+		}
 	}
 }

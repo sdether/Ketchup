@@ -10,7 +10,7 @@ namespace Ketchup.Demo
 {
 	public class Program
 	{
-		private static bool debugAsync = true;
+		private static bool debugAsync = false;
 
 		static void Main(string[] args)
 		{
@@ -23,7 +23,7 @@ namespace Ketchup.Demo
 			var numberOfOperations = 0;
 			if (!int.TryParse(Console.ReadLine(), out numberOfOperations)) return;
 			var ecli = new MemcachedClient();
-			var kcli = new KetchupClient("default");
+			var kcli = new KetchupClient();
 			var etime = 0d;
 			Console.WriteLine("Number of Operations: " + numberOfOperations);
 			if (!debugAsync)
@@ -82,19 +82,21 @@ namespace Ketchup.Demo
 			{
 				var key = "kc" + i;
 				var value = key + " value";
+				var bucket = "default";
 
 				TestAsync(5, (success, fail) =>
 				{
-					cli.Set(key, value, success, fail, new { });
+					cli.Set(key, bucket, value, success, fail, new { });
 				});
 			}
 
 			for (var i = 0; i < numberOfOperations; i++)
 			{
 				var key = "kc" + i;
+				var bucket = "default";
 				TestAsync(5, (success, fail) =>
 				{
-					cli.Get<string>(key, (val, istate) =>
+					cli.Get<string>(key, bucket, (val, istate) =>
 					{
 						//Console.WriteLine(key + ": " + val);
 						success(istate);
@@ -124,8 +126,9 @@ namespace Ketchup.Demo
 				{
 					var key = "kc" + i;
 					var value = key + " value";
+					var bucket = "default";
 					object asyncState = new DemoAsyncState { Key = key };
-					cli.Set(key, value,
+					cli.Set(key, bucket, value,
 						s =>
 						{
 							lock (sync)
@@ -145,9 +148,11 @@ namespace Ketchup.Demo
 				for (var i = 0; i < numberOfOperations; i++)
 				{
 					var key = "kc" + i;
+					var bucket = "default";
+
 					//get is fired on success return of set
 					var asyncState = new DemoAsyncState { Key = key, Counter = counter };
-					cli.Get<string>(key, (val, s) =>
+					cli.Get<string>(key, bucket, (val, s) =>
 					{
 						lock (sync)
 						{

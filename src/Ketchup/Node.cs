@@ -1,42 +1,64 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Configuration;
+using System.Diagnostics;
 using System.Net.Sockets;
+using System.Threading;
 using Ketchup.Config;
-using System.Collections.Generic;
-using Ketchup.Protocol.Operations;
+using Ketchup.IO;
 
 namespace Ketchup
 {
 	public class Node
 	{
 		private readonly object _sync = new object();
-		private readonly Processor _processor;
-		private Socket _nodeSocket;
-
+		private readonly ConcurrentQueue<Socket> _socketPool = new ConcurrentQueue<Socket>();
+		private readonly ManualResetEvent _handle = new ManualResetEvent(false);
+		private int _totalSocketsCreated;
+		
 		public int Port { get; set; }
 		public int CurrentRetryCount { get; set; }
 		public bool IsDead { get; set; }
 		public string Host { get; set; }
 		public DateTime DeadAt { get; set; }
 		public DateTime LastConnectionFailure { get; set; }
-
+		
 		public string Id
 		{
 			get { return Host + ":" + Port; }
 		}
 
-		public Socket NodeSocket
+		public Socket GetSocketFromPool()
 		{
-			get
-			{
-				lock (_sync)
-				{
-					if (_nodeSocket == null)
-						_nodeSocket = Connect(CreateSocket());
-				}
-				return Connect(_nodeSocket);
+			Socket socket;
+			if (_socketPool.TryDequeue(out socket)) {
+				Debug.WriteLine(Host + " Socket Re-used: " + _totalSocketsCreated);
+				return socket;
 			}
+
+			var maxPooledSockets = KetchupConfig.Current.MaxPooledSockets;
+			lock(_sync) {
+				if (_totalSocketsCreated < maxPooledSockets) {
+					socket = Connect(CreateSocket());
+					_totalSocketsCreated++;
+					Debug.WriteLine(Host + " Socket Created: " + _totalSocketsCreated);
+					return socket;
+				}
+			}
+			
+			_handle.Reset();
+			var maxWait = new TimeSpan(0, 0, KetchupConfig.Current.MaxPooledSocketWait);
+			Debug.WriteLine(Host + " Wait");
+			if (!_handle.WaitOne(maxWait))
+				throw new TimeoutException("Ketchup client timed out while waiting for a socket connection from the pool");
+
+			return GetSocketFromPool();
+		}
+
+		public void ReleaseSocket(Socket socket) 
+		{
+			_socketPool.Enqueue(socket);
+			_handle.Set();
 		}
 
 		public Node()
@@ -45,9 +67,6 @@ namespace Ketchup
 			CurrentRetryCount = -1;
 			DeadAt = DateTime.MinValue;
 			LastConnectionFailure = DateTime.MinValue;
-
-			_processor = new Processor(this);
-			_processor.Start();
 		}
 
 		public Node(string host, int port)
@@ -55,22 +74,6 @@ namespace Ketchup
 		{
 			Host = host;
 			Port = port;
-		}
-
-		public void Request(byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)
-		{
-			var op = new Operation()
-			{
-				Error = error,
-				Process = process,
-				Packet = packet,
-				State = state,
-				Socket = NodeSocket,
-			};
-
-			//the operation is picked up by a different thread later which deals with the packets
-			_processor.Enqueue(op);
-			//Thread.Sleep(20);
 		}
 
 		private Socket Connect(Socket socket)
@@ -111,7 +114,8 @@ namespace Ketchup
 				ReceiveTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
 				NoDelay = true,
 				Blocking = true,
-				UseOnlyOverlappedIO = false
+				UseOnlyOverlappedIO = false,
+				DontFragment = true,
 			};
 		}
 

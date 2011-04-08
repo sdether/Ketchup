@@ -46,11 +46,11 @@
     <Compile Include="Config\KetchupConfigSection.cs" />
     <Compile Include="Hashing\CRC32.cs" />
     <Compile Include="Hashing\IHashingAlgortihm.cs" />
+    <Compile Include="IO\SocketIO.cs" />
     <Compile Include="Protocol\Commands\SetAddReplaceCommand.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Protocol\Operations\Buffer.cs" />
-    <Compile Include="Protocol\Operations\Operation.cs" />
+    <Compile Include="IO\Operation.cs" />
     <Compile Include="Protocol\Packet.cs" />
     <Compile Include="Protocol\Enums.cs" />
     <Compile Include="Node.cs" />
@@ -61,12 +61,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Async\GetExtensions.cs" />
     <Compile Include="Hashing\Hasher.cs" />
-    <Compile Include="Protocol\PacketExtensions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Protocol\Exceptions\ProtocolExceptions.cs" />
     <Compile Include="Protocol\Commands\GetCommand.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Protocol\Operations\Processor.cs" />
+    <Compile Include="IO\EventLoop.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
