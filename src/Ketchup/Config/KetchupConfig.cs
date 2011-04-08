@@ -54,6 +54,17 @@ namespace Ketchup.Config
 		/// </summary>
 		public int BufferSize { get; set; }
 
+		/// <summary>
+		/// The maximum number of sockets that can be created in the Socket Pool, default is 10
+		/// </summary>
+		public int MaxPooledSockets { get; set; }
+
+		/// <summary>
+		/// The number of seconds to wait to acquire a socket from the Pool, default is 5
+		/// </summary>
+		public int MaxPooledSocketWait { get; set; }
+
+
 		#endregion
 
 		public KetchupConfig()
@@ -66,6 +77,8 @@ namespace Ketchup.Config
 			DeadNodeRetryDelay = new TimeSpan(0, 0, 1);
 			HashingAlgorithm = HashingAlgortihm.Default;
 			BufferSize = 1024;
+			MaxPooledSockets = 10;
+			MaxPooledSocketWait = 5;
 		}
 
 		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)

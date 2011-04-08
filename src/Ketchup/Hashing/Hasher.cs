@@ -24,7 +24,7 @@ namespace Ketchup.Hashing {
 			}
 
 			var nodes = config.GetNodes(bucket);
-			var idx = hash % nodes.Count;
+			var idx = Math.Abs(hash % nodes.Count);
 			return nodes[idx];
 		}
 

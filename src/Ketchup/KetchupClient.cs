@@ -24,7 +24,7 @@ namespace Ketchup {
 
 		public KetchupClient QueueOperation(Node node, byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)
 		{
-			var op = new Operation(packet, node.NodeSocket, process, error, state);
+			var op = new Operation(packet, node, process, error, state);
 			loop.QueueSend(op);
 			return this;
 		}
