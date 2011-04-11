@@ -47,7 +47,8 @@ namespace Ketchup.Config {
 
 			//buckets;
 			foreach (ConfigBucket cb in ConfigBuckets) {
-				var bucket = new Bucket(client) {
+				var bucket = new Bucket() {
+					Client = client,
 					Name = cb.Name,
 					Port = cb.Port,
 					Prefix = cb.Prefix

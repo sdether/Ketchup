@@ -92,9 +92,16 @@ namespace Ketchup.Config
 			DefaultExpiration = 0;
 		}
 
-		public KetchupConfig AddBucket(KetchupClient client, string name = "default", int port = 0, bool prefix = true)
+		public KetchupConfig(string bucketName, string host, int port) 
+			:this()
 		{
-			return AddBucket(new Bucket(client)
+			AddBucket(bucketName, port);
+			AddNode(host);
+		}
+
+		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)
+		{
+			return AddBucket(new Bucket()
 			{
 				Name = name,
 				Port = port,

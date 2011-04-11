@@ -12,9 +12,8 @@ namespace Ketchup {
 		public IList<string> ConfigNodes { get; private set; }
 		public IDictionary<string, string> Attributes { get; private set; }
 
-		public Bucket(KetchupClient client) 
+		public Bucket() 
 		{
-			Client = client;
 			Name = "default";
 			Port = 0;
 			Prefix = true;
