@@ -1,6 +1,7 @@
 ﻿using System;
 using Ketchup;
 using Ketchup.Async;
+using Ketchup.Config;
 
 public class Program
 {
@@ -11,7 +12,7 @@ public class Program
 	public static void Main(string[] args)
 	{
 		//Initialize Ketchup Client
-		var config = new Ketchup.Config.KetchupConfig("default", "127.0.0.1", 11211);
+		var config = new KetchupConfig("default", "127.0.0.1", 11211);
 		var client = new KetchupClient(config);
 		_bucket = client.GetBucket("default");
 

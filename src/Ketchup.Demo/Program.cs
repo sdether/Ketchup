@@ -3,6 +3,7 @@ using System.Threading;
 using Enyim.Caching;
 using Enyim.Caching.Memcached;
 using Ketchup.Async;
+using Ketchup.Commands;
 
 namespace Ketchup.Demo
 {

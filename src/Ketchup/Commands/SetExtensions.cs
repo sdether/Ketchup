@@ -1,21 +1,21 @@
 ﻿using System;
 using Ketchup.Silent;
 
-namespace Ketchup
+namespace Ketchup.Commands
 {
 	public static class SetExtensions
 	{
-		public static void Set<T>(this Bucket bucket, string key, T value) 
+		public static void Set<T>(this Bucket bucket, string key, T value)
 		{
 			SilentSetExtensions.Set(bucket, key, value);
 		}
 
-		public static void Set<T>(this Bucket bucket, string key, T value, TimeSpan expiration) 
+		public static void Set<T>(this Bucket bucket, string key, T value, TimeSpan expiration)
 		{
 			SilentSetExtensions.Set(bucket, key, value, expiration);
 		}
 
-		public static void Set<T>(this Bucket bucket, string key, T value, DateTime expiration) 
+		public static void Set<T>(this Bucket bucket, string key, T value, DateTime expiration)
 		{
 			SilentSetExtensions.Set(bucket, key, value, expiration);
 		}

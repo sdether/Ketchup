@@ -28,6 +28,7 @@ By default, Ketchup attempts to choose the most performant options:
 Example:
 
 		using Ketchup;
+		using Ketchup.Commands;
 
 		public class Program
 		{
@@ -53,36 +54,10 @@ Example:
 
 However, you can expose Asynchronous, Synchronous, Quiet or Silent commands by using Extension methods specified by a using statement
 
-* Synchronous: using Ketchup.Sync
+* Synchronous ([Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/SynchronousExample/Program.cs)): using Ketchup.Sync
 * Asynchronous ([Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)): using Ketchup.Async
 * Quiet: using Ketchup.Quiet
 * Silent: using Ketchup.Silent
-
-Synchronous Example:
-
-		using Ketchup.Sync
-
-		public class Program
-		{
-			static void Main(string[] args)
-			{
-				var key = "key-sync";
-				var value = "key-sync-value";
-				var bucket = new KetchupClient().Default;
-
-				//Set
-				if (!bucket.Set(key, value))
-					Console.WriteLine("Setting key " + key + " failed.");
-
-				var expected = value;
-				var actual = bucket.Get<string>(key);
-
-				Console.WriteLine("Expected: " + expected + " Actual: " + actual + " Match: " + (expected == actual).ToString());
-
-				if(!bucket.Delete(key))
-					Console.WriteLine("Deleting key " + key " failed.");
-			}
-		}
 
 Quiet Example - like Async only uninteresting responses are suppressed
 

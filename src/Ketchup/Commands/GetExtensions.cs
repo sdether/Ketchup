@@ -1,6 +1,6 @@
 ﻿using Ketchup.Sync;
 
-namespace Ketchup
+namespace Ketchup.Commands
 {
 	public static class GetExtensions
 	{

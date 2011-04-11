@@ -1,6 +1,6 @@
 ﻿using Ketchup.Silent;
 
-namespace Ketchup
+namespace Ketchup.Commands
 {
 	public static class DeleteExtensions
 	{
