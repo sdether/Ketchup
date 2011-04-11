@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Dynamic;
 using System.Threading;
 using Enyim.Caching;
 using Enyim.Caching.Memcached;
 using Ketchup.Async;
-using Ketchup.Config;
 
 namespace Ketchup.Demo
 {
@@ -24,18 +22,19 @@ namespace Ketchup.Demo
 			if (!int.TryParse(Console.ReadLine(), out numberOfOperations)) return;
 			var ecli = new MemcachedClient();
 			var kcli = new KetchupClient();
+			var bucket = kcli.GetBucket("default");
 			var etime = 0d;
 			Console.WriteLine("Number of Operations: " + numberOfOperations);
 			if (!debugAsync)
 			{
 				etime = SetAndGetEnyim(numberOfOperations, ecli);
 				Console.WriteLine("Enyim: " + etime + " seconds");
-				var ktimes = SetAndGetKetchupSync(numberOfOperations, kcli);
+				var ktimes = SetAndGetKetchupSync(numberOfOperations, bucket);
 				var ptimes = Math.Round(((etime - ktimes) / etime) * 100);
 				Console.WriteLine("Ketchup Sync: " + ktimes + " seconds (" + ptimes + "% faster)");
 			}
 
-			var ktimea = SetAndGetKetchupAsync(numberOfOperations, kcli);
+			var ktimea = SetAndGetKetchupAsync(numberOfOperations, bucket);
 			if (!debugAsync)
 			{
 				var ptimea = Math.Round(((etime - ktimea) / etime) * 100);
@@ -74,34 +73,23 @@ namespace Ketchup.Demo
 			return (DateTime.Now - start).TotalSeconds;
 		}
 
-		public static double SetAndGetKetchupSync(int numberOfOperations, KetchupClient cli)
+		public static double SetAndGetKetchupSync(int numberOfOperations, Bucket cli)
 		{
 			var start = DateTime.Now;
 
-			for (var i = 0; i < numberOfOperations; i++)
-			{
-				var key = "kc" + i;
-				var value = key + " value";
-				var bucket = "default";
-
-				TestAsync(5, (success, fail) =>
-				{
-					cli.Set(key, bucket, value, success, fail, new { });
-				});
-			}
+			//for (var i = 0; i < numberOfOperations; i++)
+			//{
+			//    var key = "kc" + i;
+			//    var value = key + " value";
+			//    cli.Set(key, value);
+			//}
 
 			for (var i = 0; i < numberOfOperations; i++)
 			{
 				var key = "kc" + i;
-				var bucket = "default";
-				TestAsync(5, (success, fail) =>
-				{
-					cli.Get<string>(key, bucket, (val, istate) =>
-					{
-						//Console.WriteLine(key + ": " + val);
-						success(istate);
-					}, success, fail, new { });
-				});
+				var expected = key + " value";
+				var actual = cli.Get<string>(key);
+				if (actual != expected) Console.WriteLine("Values did not match. expected: " + expected + ". actual: " + actual);
 			}
 
 			return (DateTime.Now - start).TotalSeconds;
@@ -113,7 +101,7 @@ namespace Ketchup.Demo
 			public string Key { get; set; }
 		}
 
-		public static double SetAndGetKetchupAsync(int numberOfOperations, KetchupClient cli)
+		public static double SetAndGetKetchupAsync(int numberOfOperations, Bucket cli)
 		{
 			var counter = numberOfOperations;
 			var start = DateTime.Now;
@@ -128,7 +116,7 @@ namespace Ketchup.Demo
 					var value = key + " value";
 					var bucket = "default";
 					object asyncState = new DemoAsyncState { Key = key };
-					cli.Set(key, bucket, value,
+					cli.Set(key, value,
 						s =>
 						{
 							lock (sync)
@@ -152,7 +140,7 @@ namespace Ketchup.Demo
 
 					//get is fired on success return of set
 					var asyncState = new DemoAsyncState { Key = key, Counter = counter };
-					cli.Get<string>(key, bucket, (val, s) =>
+					cli.Get<string>(key, (val, s) =>
 					{
 						lock (sync)
 						{

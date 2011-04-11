@@ -1,65 +1,64 @@
 ﻿using System;
 using Ketchup.Config;
 using Ketchup.Hashing;
-using Ketchup.IO;
+using Ketchup.Interfaces;
 
 namespace Ketchup.Protocol.Commands
 {
-	public class SetAddReplaceCommand<T>
+	public class SetAddReplaceCommand<T> : ICommand
 	{
 		private static readonly KetchupConfig config = KetchupConfig.Current;
 
-		public KetchupClient Client { get; set; }
+		public Bucket Bucket { get; set; }
 		public string Key { get; set; }
-		public string Bucket { get; set; }
 		public T Value { get; set; }
 		public int Expiration { get; set; }
 		public object State { get; set; }
 		public Action<object> Success { get; set; }
 		public Action<Exception, object> Error { get; set; }
 
-		public SetAddReplaceCommand(KetchupClient client, string key, string bucket, T value)
+		public SetAddReplaceCommand(Bucket bucket, string key, T value)
 		{
-			Client = client;
+			Bucket = bucket;
 			Key = key;
 			Value = value;
 			Bucket = bucket;
 		}
 
-		public KetchupClient SetAddReplace(Op operation)
+		public Bucket SetAddReplace(Op opcode)
 		{
 			var extras = new byte[8];
 			Expiration.CopyTo(extras, 4);
-			var packet = new Packet<T>(operation, config.GetPrefixKey(Key, Bucket)).Extras(extras).Value(Value).Serialize();
-			var node = Hasher.GetNode(Key, Bucket);
-			return Client.QueueOperation(node, packet, Process, Error, this);
+			var packet = new Packet<T>(opcode, Bucket.ModifiedKey(Key)).Extras(extras).Value(Value).Serialize();
+			var node = Hasher.GetNode(Bucket, Key);
+			return Bucket.QueueOperation(node, packet, Process, Error, this);
 		}
 
-		public static void Process(byte[] response, object state)
+		public void Process(byte[] response, object command)
 		{
-			var op = (SetAddReplaceCommand<T>)state;
+			var cmd = (SetAddReplaceCommand<T>)command;
 			try
 			{
 				new Packet<T>(response).Value();
-				if (op.Success != null) op.Success(op.State);
+				if (cmd.Success != null) cmd.Success(cmd.State);
 			}
 			catch (Exception ex)
 			{
-				if (op.Error != null) op.Error(ex, op.State);
+				if (cmd.Error != null) cmd.Error(ex, cmd.State);
 			}
 		}
 
-		public KetchupClient Set()
+		public Bucket Set()
 		{
 			var op = Success == null ? Op.SetQ : Op.Set;
 			return SetAddReplace(op);
 		}
-		public KetchupClient Add()
+		public Bucket Add()
 		{
 			var op = Success == null ? Op.AddQ : Op.Add;
 			return SetAddReplace(op);
 		}
-		public KetchupClient Replace()
+		public Bucket Replace()
 		{
 			var op = Success == null ? Op.ReplaceQ : Op.Replace;
 			return SetAddReplace(op);

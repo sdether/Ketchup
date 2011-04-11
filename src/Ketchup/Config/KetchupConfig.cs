@@ -10,7 +10,7 @@ namespace Ketchup.Config
 		private readonly IList<string> configNodes = new List<string>();
 		private readonly NodeList nodes = new NodeList();
 
-		public static KetchupConfig Current { get; private set; }		
+		public static KetchupConfig Current { get; private set; }
 
 		#region settings
 
@@ -64,6 +64,15 @@ namespace Ketchup.Config
 		/// </summary>
 		public int MaxPooledSocketWait { get; set; }
 
+		/// <summary>
+		/// The number of seconds to wait for a synchronous command to return, default is 1
+		/// </summary>
+		public int SyncCommandTimeout { get; set; }
+
+		/// <summary>
+		/// The default expiration time for new keys when no expiration is specified, default is 0 (never expires)
+		/// </summary>
+		public int DefaultExpiration { get; set; }
 
 		#endregion
 
@@ -79,11 +88,13 @@ namespace Ketchup.Config
 			BufferSize = 1024;
 			MaxPooledSockets = 10;
 			MaxPooledSocketWait = 5;
+			SyncCommandTimeout = 5;
+			DefaultExpiration = 0;
 		}
 
-		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)
+		public KetchupConfig AddBucket(KetchupClient client, string name = "default", int port = 0, bool prefix = true)
 		{
-			return AddBucket(new Bucket
+			return AddBucket(new Bucket(client)
 			{
 				Name = name,
 				Port = port,
@@ -95,6 +106,23 @@ namespace Ketchup.Config
 		{
 			buckets.Add(bucket.Name, bucket);
 			return this;
+		}
+
+		public Bucket DefaultBucket
+		{
+			get
+			{
+				foreach (var bucket in buckets.Values)
+				{
+					return bucket;
+				}
+				throw new Exception("Default bucket not defined in configuration");
+			}
+		}
+
+		public Bucket GetBucket(string bucketName)
+		{
+			return buckets[bucketName];
 		}
 
 
@@ -113,31 +141,23 @@ namespace Ketchup.Config
 			return node;
 		}
 
-		public IList<Node> GetNodes(string bucket)
+		public IList<Node> GetNodes(Bucket bucket)
 		{
-			return bucketNodes[bucket];
+			return bucketNodes[bucket.Name];
 		}
 
-		public string GetPrefixKey(string key, string bucket)
+		public static KetchupConfig Init(KetchupConfig config, KetchupClient client)
 		{
-			return buckets[bucket].Prefix ? bucket + "-" + key : key;
-		}
-
-		public string GetOriginalKey(string key, string bucket)
-		{
-			return buckets[bucket].Prefix ? key.Substring(bucket.Length + 1) : key;
-		}
-
-		public static KetchupConfig Init(KetchupConfig config)
-		{
-			config.Init();
+			config.Init(client);
 			return config;
 		}
 
-		internal KetchupConfig Init()
+		internal KetchupConfig Init(KetchupClient client)
 		{
 			foreach (var bucket in buckets.Values)
 			{
+				bucket.Client = client;
+
 				/* there are 3 options for buckets: nodes defined, port defined, all endpoints
 				 * there are 2 options for nodes: ip defined, ip+port defined
 				 */

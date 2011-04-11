@@ -9,16 +9,25 @@ namespace Ketchup {
 	{
 		private readonly EventLoop loop = new EventLoop();
 
+		public Bucket Default 
+		{
+			get 
+			{
+				return KetchupConfig.Current.DefaultBucket;
+			}	
+		}
+
+
 		public KetchupClient() 
 		{
 			var config = GetConfig();
-			KetchupConfig.Init(config);
+			KetchupConfig.Init(config, this);
 			loop.Start();
 		}
 
 		public KetchupClient(KetchupConfig config) 
 		{
-			KetchupConfig.Init(config);
+			KetchupConfig.Init(config, this);
 			loop.Start();
 		}
 
@@ -29,13 +38,18 @@ namespace Ketchup {
 			return this;
 		}
 
-		private static KetchupConfig GetConfig()
+		public Bucket GetBucket(string bucketName) 
+		{
+			return KetchupConfig.Current.GetBucket(bucketName);
+		}
+
+		private KetchupConfig GetConfig()
 		{
 			var configSection = KetchupConfigSection.Current;
 			if (configSection == null) throw new ConfigurationErrorsException(
 				"Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file.");
 
-			return configSection.ToKetchupConfig();
+			return configSection.ToKetchupConfig(this);
 		}
 	}
 }

@@ -9,12 +9,6 @@
 //{
 //    internal static class Operations
 //    {
-//        private static readonly KetchupConfig config = KetchupConfig.Current;
-
-
-//        public static void SetAddReplace<T>(Op operation, SetState<T> state)
-//        {
-
 //        //public static void Delete(Op operation, string key, string bucket, Action success, Action<Exception> error)
 //        //{
 //        //    var packet = new Packet<string>(operation, config.GetPrefixKey(key, bucket));

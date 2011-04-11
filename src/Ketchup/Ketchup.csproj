@@ -41,12 +41,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Async\SetExtensions.cs" />
+    <Compile Include="Commands\Async\AsyncDeleteExtensions.cs" />
+    <Compile Include="Commands\Async\AsyncSetExtensions.cs" />
     <Compile Include="Bucket.cs" />
+    <Compile Include="Commands\DeleteExtensions.cs" />
+    <Compile Include="Commands\Quiet\QuietDeleteExtensions.cs" />
+    <Compile Include="Commands\Quiet\QuietGetExtensions.cs" />
+    <Compile Include="Commands\Quiet\QuietSetExtensions.cs" />
+    <Compile Include="Commands\SetExtensions.cs" />
+    <Compile Include="Commands\Silent\SilentDeleteExtensions.cs" />
+    <Compile Include="Commands\Silent\SilentGetExtensions.cs" />
+    <Compile Include="Commands\Silent\SilentSetExtensions.cs" />
+    <Compile Include="Commands\Sync\SyncDeleteExtensions.cs" />
+    <Compile Include="Commands\Sync\SyncSetExtensions.cs" />
+    <Compile Include="Commands\Sync\SyncGetExtensions.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
     <Compile Include="Hashing\CRC32.cs" />
     <Compile Include="Hashing\IHashingAlgortihm.cs" />
+    <Compile Include="Interfaces\ICommand.cs" />
     <Compile Include="IO\SocketIO.cs" />
+    <Compile Include="Protocol\Commands\DeleteCommand.cs" />
     <Compile Include="Protocol\Commands\SetAddReplaceCommand.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -59,7 +73,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="KetchupClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Async\GetExtensions.cs" />
+    <Compile Include="Commands\Async\AsyncGetExtensions.cs" />
     <Compile Include="Hashing\Hasher.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Protocol\Exceptions\ProtocolExceptions.cs" />
@@ -67,8 +81,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IO\EventLoop.cs" />
+    <Compile Include="Commands\GetExtensions.cs" />
+    <Compile Include="Commands\Sync\SyncExtensions.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

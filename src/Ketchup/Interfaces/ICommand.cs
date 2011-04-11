@@ -4,10 +4,10 @@ namespace Ketchup.Interfaces
 {
 	public interface ICommand
 	{
-		KetchupClient Client { get; set; }
+		Bucket Bucket { get; set; }
 		string Key { get; set; }
-		string Bucket { get; set; }
 		object State { get; set; }
-		void Process(byte[] response, Exception exception);
+		Action<Exception, object> Error { get; set; }		
+		void Process(byte[] response, object command);
 	}
 }

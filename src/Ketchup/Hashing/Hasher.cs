@@ -8,11 +8,12 @@ namespace Ketchup.Hashing {
 		private static readonly KetchupConfig config = KetchupConfig.Current;
 		private static readonly Crc32 crc32 = new Crc32();
 
-		public static Node GetNode(string key, string bucket) {
-			return GetNode(key, bucket, config.HashingAlgorithm);
+		public static Node GetNode(Bucket bucket, string key) {
+			return GetNode(bucket, key, config.HashingAlgorithm);
 		}
 
-		public static Node GetNode(string key, string bucket, HashingAlgortihm hashAlgorithm) {
+		public static Node GetNode(Bucket bucket, string key, HashingAlgortihm hashAlgorithm)
+		{
 			int hash;
 			switch (hashAlgorithm) {
 				case HashingAlgortihm.Ketama:
@@ -28,8 +29,8 @@ namespace Ketchup.Hashing {
 			return nodes[idx];
 		}
 
-		public static Node Node(this KetchupClient client, string key, string bucket) {
-			return GetNode(key, bucket);
+		public static Node Node(this Bucket bucket, string key) {
+			return GetNode(bucket, key);
 		}
 
 		private static int DefaultHash(string key) {
