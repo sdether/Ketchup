@@ -16,13 +16,15 @@ Once you have selected a Bucket, you can execute Memcached API commands.
 Ketchup supports 4 versions of the Memcached API commands:
 1. Synchronous - returns on main thread
 2. Asynchronous - executes callbacks on second thread
-3. Quiet - executes callbacks on second thread, supresses uninteresting responses
-4. Silent - executes callbacks on second thread, supresses uninteresting responses *and* exceptions
+3. Quiet - executes callbacks on second thread, suppresses uninteresting responses
+4. Silent - executes callbacks on second thread, suppresses uninteresting responses *and* exceptions
 
 By default, Ketchup attempts to choose the most performant options:
 
 * Sets and Deletes are executed silently
 * Gets are executed synchronously
+
+Example:
 
 		using Ketchup;
 
