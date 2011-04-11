@@ -16,7 +16,7 @@ Once you have selected a Bucket, you can execute Memcached API commands.
 Ketchup supports 4 versions of the Memcached API commands:
 
 1. Synchronous - returns on main thread
-2. Asynchronous - executes callbacks on second thread [View Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)
+2. Asynchronous ([Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)) - executes callbacks on second thread 
 3. Quiet - executes callbacks on second thread, suppresses uninteresting responses
 4. Silent - executes callbacks on second thread, suppresses uninteresting responses *and* exceptions
 
@@ -54,7 +54,7 @@ Example:
 However, you can expose Asynchronous, Synchronous, Quiet or Silent commands by using Extension methods specified by a using statement
 
 * Synchronous: using Ketchup.Sync
-* Asynchronous: using Ketchup.Async [View Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)
+* Asynchronous ([Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)): using Ketchup.Async
 * Quiet: using Ketchup.Quiet
 * Silent: using Ketchup.Silent
 
