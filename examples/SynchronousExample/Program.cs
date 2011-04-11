@@ -14,7 +14,7 @@ namespace SynchronousExample
 		public static void Main(string[] args)
 		{
 			//Initialize Ketchup client;
-			var config = new KetchupConfig("default", "172.17.6.201", 11211);
+			var config = new KetchupConfig("default", "127.0.0.1", 11211);
 			var client = new KetchupClient(config);
 			_bucket = client.GetBucket("default");
 
