@@ -16,13 +16,9 @@ Once you have selected a Bucket, you can execute Memcached API commands.
 Ketchup supports 4 versions of the Memcached API commands:
 
 1. Synchronous - returns on main thread
-
-2. Asynchronous - executes callbacks on second thread
-
+2. Asynchronous - executes callbacks on second thread [View Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)
 3. Quiet - executes callbacks on second thread, suppresses uninteresting responses
-
 4. Silent - executes callbacks on second thread, suppresses uninteresting responses *and* exceptions
-
 
 By default, Ketchup attempts to choose the most performant options:
 
@@ -57,8 +53,8 @@ Example:
 
 However, you can expose Asynchronous, Synchronous, Quiet or Silent commands by using Extension methods specified by a using statement
 
-* Asynchronous: using Ketchup.Async
 * Synchronous: using Ketchup.Sync
+* Asynchronous: using Ketchup.Async [View Example](https://github.com/jasonsirota/Ketchup/blob/master/examples/AsynchronousExample/Program.cs)
 * Quiet: using Ketchup.Quiet
 * Silent: using Ketchup.Silent
 
@@ -85,60 +81,6 @@ Synchronous Example:
 
 				if(!bucket.Delete(key))
 					Console.WriteLine("Deleting key " + key " failed.");
-			}
-		}
-
-Asynchronous Example
-
-		using Ketchup.Async
-
-		public class Program
-		{
-			static void Main(string[] args)
-			{
-				var key = "key-async";
-				var value = "key-async-value";
-				var state = default(object);
-				var bucket = new KetchupClient().Default;
-
-				//Set
-				bucket.Set(key, value,
-					(stateSet) => 
-					{ 
-						//set was successful, try Get
-						bucket.Get(key,
-							(val, stateGetHit) =>
-							{
-								//a hit was fired, now delete it
-								bucket.Delete(key,
-									(stateDelete) => 
-									{
-										Console.WriteLine("Set, Get and Delete commands for key " + key " were successful");
-									}
-									(exceptionDelete, stateDelete) =>
-									{
-										Console.WriteLine("Delete command for key " + key + " failed.");
-									},
-									stateGetHit
-								);
-							},
-							(stateGetMiss) =>
-							{
-								Console.WriteLine("Get command for key " + key + " returned miss");
-							},
-							(exceptionGet,stateGetException) =>
-							{
-								Consoles.WriteLine("Get command for key " + key + " failed");
-							},
-							stateSet
-						);
-					},
-					(exceptionSet, stateSetException) => 
-					{
-						Console.WriteLine("Set command for key " + key + " failed"); 
-					},
-					state
-				);
 			}
 		}
 
