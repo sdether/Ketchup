@@ -9,7 +9,7 @@ namespace Ketchup {
 	{
 		private readonly EventLoop loop = new EventLoop();
 
-		public Bucket Default 
+		public Bucket DefaultBucket
 		{
 			get 
 			{
@@ -27,8 +27,14 @@ namespace Ketchup {
 
 		public KetchupClient(KetchupConfig config) 
 		{
-			KetchupConfig.Init(config, this);
+			config.Init(this);
 			loop.Start();
+		}
+
+		public KetchupClient(string host, int port) 
+		{
+			var config = new KetchupConfig("default", host, port);
+			config.Init(this);
 		}
 
 		public KetchupClient QueueOperation(Node node, byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)

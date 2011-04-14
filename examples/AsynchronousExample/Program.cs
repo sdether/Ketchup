@@ -5,33 +5,30 @@ using Ketchup.Config;
 
 public class Program
 {
-	private static Bucket _bucket;
+	//Initialize Ketchup Client
+	private static readonly Bucket _bucket = new KetchupClient("localhost", 11211).DefaultBucket;
 	private static readonly string _key = "key-async";
 	private static readonly string _value = "key-async-value";
 
 	public static void Main(string[] args)
 	{
-		//Initialize Ketchup Client
-		var config = new KetchupConfig("default", "127.0.0.1", 11211);
-		var client = new KetchupClient(config);
-		_bucket = client.GetBucket("default");
-
 		//Set asyncrhonously, call OnSetSuccess() on success and OnSetError on Exception
-		_bucket.Set(_key, _value, OnSetSuccess<string>, OnSetError, null);
+		var state = default(object);
+		_bucket.Set(_key, _value, OnSetSuccess<string>, OnSetError, state);
 	}
 
 	private static void OnSetSuccess<T>(object state)
 	{
 		//Set was successful, now execute Get async
 		//Pass callbacks for OnGetHit, OnGetMiss, OnGetError
-		_bucket.Get<T>(_key, OnGetHit, OnGetMiss, OnGetError, null);
+		_bucket.Get<T>(_key, OnGetHit, OnGetMiss, OnGetError, state);
 	}
 
 	private static void OnGetHit<T>(T value, object state)
 	{
 		//OnGetHit success, now execute Delete
 		//Pass callbacks for OnDeleteSuccess and OnDeleteError
-		_bucket.Delete(_key, OnDeleteSuccess, OnDeleteError, null);
+		_bucket.Delete(_key, OnDeleteSuccess, OnDeleteError, state);
 	}
 
 	private static void OnDeleteSuccess(object state)

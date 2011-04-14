@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{50F1BA9F-9482-4384-94A1-617846627C14}</ProjectGuid>
+    <ProjectGuid>{535CE616-296C-44CD-AEED-7261A3BDFC4E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SynchronousExample</RootNamespace>
-    <AssemblyName>SynchronousExample</AssemblyName>
+    <RootNamespace>QuietExample</RootNamespace>
+    <AssemblyName>QuietExample</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

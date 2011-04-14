@@ -47,7 +47,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Ketchup\Ketchup.csproj">
+    <ProjectReference Include="..\..\src\Ketchup.csproj">
       <Project>{46A72B27-5051-45EC-A651-A8A4A53320F6}</Project>
       <Name>Ketchup</Name>
     </ProjectReference>

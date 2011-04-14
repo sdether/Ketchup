@@ -53,8 +53,8 @@
     <Compile Include="Commands\Silent\SilentGetExtensions.cs" />
     <Compile Include="Commands\Silent\SilentSetExtensions.cs" />
     <Compile Include="Commands\Sync\SyncDeleteExtensions.cs" />
-    <Compile Include="Commands\Sync\SyncSetExtensions.cs" />
     <Compile Include="Commands\Sync\SyncGetExtensions.cs" />
+    <Compile Include="Commands\Sync\SyncSetExtensions.cs" />
     <Compile Include="Config\KetchupConfigSection.cs" />
     <Compile Include="Hashing\CRC32.cs" />
     <Compile Include="Hashing\IHashingAlgortihm.cs" />
