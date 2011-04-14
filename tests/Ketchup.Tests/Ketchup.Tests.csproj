@@ -43,13 +43,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncTests.cs" />
+    <Compile Include="Commands\DeleteTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Commands\GetTests.cs" />
+    <Compile Include="Commands\SetAddReplaceTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ketchup\Ketchup.csproj">
+    <ProjectReference Include="..\..\src\Ketchup.csproj">
       <Project>{46A72B27-5051-45EC-A651-A8A4A53320F6}</Project>
       <Name>Ketchup</Name>
     </ProjectReference>

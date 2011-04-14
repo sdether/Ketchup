@@ -17,24 +17,25 @@ namespace Ketchup {
 			}	
 		}
 
-
-		public KetchupClient() 
-		{
-			var config = GetConfig();
-			KetchupConfig.Init(config, this);
-			loop.Start();
-		}
-
-		public KetchupClient(KetchupConfig config) 
+		public KetchupClient(KetchupConfig config)
 		{
 			config.Init(this);
 			loop.Start();
+		}
+
+		public KetchupClient()
+			: this (GetConfig())
+		{
 		}
 
 		public KetchupClient(string host, int port) 
+			:this(host + ":" + port)
 		{
-			var config = new KetchupConfig("default", host, port);
-			config.Init(this);
+		}
+
+		public KetchupClient(string endpoint)
+			: this(new KetchupConfig().AddNode(endpoint).AddBucket())
+		{
 		}
 
 		public KetchupClient QueueOperation(Node node, byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object state)
@@ -49,13 +50,13 @@ namespace Ketchup {
 			return KetchupConfig.Current.GetBucket(bucketName);
 		}
 
-		private KetchupConfig GetConfig()
+		private static KetchupConfig GetConfig()
 		{
 			var configSection = KetchupConfigSection.Current;
 			if (configSection == null) throw new ConfigurationErrorsException(
 				"Configuration missing. Either create a new KetchupConfig and call KetchupConfig.Init() or add a KetchupConfigSection to your config file.");
 
-			return configSection.ToKetchupConfig(this);
+			return configSection.ToKetchupConfig();
 		}
 	}
 }

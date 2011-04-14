@@ -1,20 +1,24 @@
 ﻿using System;
+using Ketchup.Async;
 
-namespace Ketchup.Async.Silent {
+namespace Ketchup.Silent
+{
+	public static class SilentReplaceExtensions
+	{
+		public static Bucket Replace<T>(this Bucket bucket, string key, T value)
+		{
+			return AsyncReplaceExtensions.Replace(bucket, key, value, null, null, null);
+		}
 
-	public static class SilentReplaceExtensions {
+		public static Bucket Replace<T>(this Bucket bucket, string key, T value, TimeSpan expiration)
+		{
+			return AsyncReplaceExtensions.Replace(bucket, key, value, expiration, null, null, null);
+		}
 
-		//public static KetchupClient Replace<T>(this KetchupClient client, string key, T value) {
-		//    return client.Replace(key, value, null, null);
-		//}
-
-		//public static KetchupClient Replace<T>(this KetchupClient client, string key, T value, TimeSpan expiration) {
-		//    return client.Replace(key, value, expiration, null, null);
-		//}
-
-		//public static KetchupClient Replace<T>(this KetchupClient client, string key, T value, DateTime expiration) {
-		//    return client.Replace(key, value, expiration, null, null);
-		//}
+		public static Bucket Replace<T>(this Bucket bucket, string key, T value, DateTime expiration)
+		{
+			return AsyncReplaceExtensions.Replace(bucket, key, value, expiration, null, null, null);
+		}
 	}
 }
 

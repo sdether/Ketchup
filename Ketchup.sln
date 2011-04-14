@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsynchronousPerformanceExam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultExample", "examples\DefaultExample\DefaultExample.csproj", "{A9B44889-4D61-4F67-9C34-AA26D4ED552E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ketchup.Tests", "tests\Ketchup.Tests\Ketchup.Tests.csproj", "{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,16 @@ Global
 		{A9B44889-4D61-4F67-9C34-AA26D4ED552E}.Release|Mixed Platforms.Build.0 = Release|x86
 		{A9B44889-4D61-4F67-9C34-AA26D4ED552E}.Release|x86.ActiveCfg = Release|x86
 		{A9B44889-4D61-4F67-9C34-AA26D4ED552E}.Release|x86.Build.0 = Release|x86
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,5 +130,6 @@ Global
 		{FA0D941B-D94C-4FFA-8650-261C778AE7EE} = {B2EC084F-4596-4FB3-8F9B-C24CB4B3C54B}
 		{27BBE267-922F-4332-96F9-FDFC39D59907} = {B2EC084F-4596-4FB3-8F9B-C24CB4B3C54B}
 		{A9B44889-4D61-4F67-9C34-AA26D4ED552E} = {B2EC084F-4596-4FB3-8F9B-C24CB4B3C54B}
+		{B96E1F34-1D3C-4CD8-8D91-8207111EAE98} = {F7C80404-CA1B-4219-9D55-029D90238D9C}
 	EndGlobalSection
 EndGlobal

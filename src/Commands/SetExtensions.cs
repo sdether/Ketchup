@@ -3,7 +3,7 @@ using Ketchup.Silent;
 
 namespace Ketchup.Commands
 {
-	public static class SetExtensions
+	public static partial class SetExtensions
 	{
 		public static void Set<T>(this Bucket bucket, string key, T value)
 		{

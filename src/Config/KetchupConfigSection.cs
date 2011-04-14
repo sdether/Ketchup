@@ -38,7 +38,7 @@ namespace Ketchup.Config {
 			}
 		}
 
-		internal KetchupConfig ToKetchupConfig(KetchupClient client) {
+		public KetchupConfig ToKetchupConfig() {
 			var config = new KetchupConfig();
 
 			//nodes;
@@ -47,8 +47,8 @@ namespace Ketchup.Config {
 
 			//buckets;
 			foreach (ConfigBucket cb in ConfigBuckets) {
-				var bucket = new Bucket() {
-					Client = client,
+				var bucket = new Bucket() 
+				{
 					Name = cb.Name,
 					Port = cb.Port,
 					Prefix = cb.Prefix

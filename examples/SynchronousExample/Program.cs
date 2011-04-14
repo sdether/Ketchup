@@ -7,19 +7,14 @@ namespace SynchronousExample
 {
 	public class Program
 	{
-		private static Bucket _bucket;
+		private static readonly Bucket _bucket = new KetchupClient("127.0.0.1", 11211).DefaultBucket;
 		private static readonly string _key = "key-sync";
 		private static readonly string _value = "key-sync-value";
 
 		public static void Main(string[] args)
 		{
-			//Initialize Ketchup client
-			var config = new KetchupConfig("default", "127.0.0.1", 11211);
-			var client = new KetchupClient(config);
-			_bucket = client.GetBucket("default");
-
 			//Set
-			if (!_bucket.Set(_key, _value))
+			if (!_bucket.Set(_key, _value)) 
 				Console.WriteLine("Setting key " + _key + " failed.");
 
 			var expected = _value;
@@ -30,7 +25,7 @@ namespace SynchronousExample
 			Console.WriteLine("Expected: " + expected + " Actual: " + actual + " Match: " + (expected == actual).ToString());
 
 			//Delete
-			if(!_bucket.Delete(_key))
+			if(!_bucket.Delete(_key)) 
 				Console.WriteLine("Deleting key " + _key + " failed.");
 
 			Console.WriteLine("Set, Get and Delete commands for key '" + _key + "' were successful");
