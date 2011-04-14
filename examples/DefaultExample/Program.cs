@@ -23,6 +23,14 @@ namespace DefaultExample
 			bucket.Delete(key);
 
 			Console.WriteLine("Expected: " + expected + " Actual: " + actual + " Match: " + (expected == actual).ToString());
+			Finish();
 		}
+
+		private static void Finish()
+		{
+			Console.WriteLine("Pess any key to continue...");
+			Console.ReadLine();
+		}
+
 	}
 }

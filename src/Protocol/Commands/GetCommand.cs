@@ -17,7 +17,7 @@ namespace Ketchup.Protocol.Commands
 		public Action<object> Miss { get; set; }
 		public Action<Exception, object> Error { get; set; }
 
-		public GetCommand(Bucket bucket, string key) 
+		public GetCommand(Bucket bucket, string key)
 		{
 			Bucket = bucket;
 			Key = key;
@@ -44,7 +44,8 @@ namespace Ketchup.Protocol.Commands
 				if (ex is NotFoundException)
 					if (cmd.Miss != null) cmd.Miss(cmd.State);
 			}
-			catch (Exception ex) {
+			catch (Exception ex)
+			{
 				if (cmd.Error != null) cmd.Error(ex, cmd.State);
 			}
 		}

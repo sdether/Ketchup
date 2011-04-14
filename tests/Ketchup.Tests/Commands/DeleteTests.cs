@@ -4,7 +4,7 @@ using Ketchup.Protocol.Exceptions;
 
 namespace Ketchup.Tests.Commands
 {
-	public class AsyncTests
+	public class DeleteTests
 	{
 		private readonly static Bucket bucket = TestHelpers.Bucket;
 
@@ -20,7 +20,7 @@ namespace Ketchup.Tests.Commands
 			success = bucket.Delete(key);
 			Assert.True(success);
 
-			var actual = bucket.Get(key);
+			var actual = bucket.Get<string>(key);
 			Assert.Null(actual);
 		}
 

@@ -62,9 +62,9 @@ namespace Ketchup.Protocol.Exceptions {
 			base("The operation is not supported", key, op, server) { }
 	}
 
-	public class ServerOutOfMemoryException : ProtocolException {
-		public ServerOutOfMemoryException(string key, Op op, string server) :
-			base("The server is out of memory", key, op, server) { }
+	public class CacheServerOutOfMemoryException : ProtocolException {
+		public CacheServerOutOfMemoryException(string key, Op op, string server) :
+			base("The cache server is out of memory", key, op, server) { }
 	}
 
 	public class TemporaryFailureException : ProtocolException {

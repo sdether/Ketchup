@@ -226,7 +226,7 @@ namespace Ketchup.Protocol
 				case Response.NotSupported:
 					throw new OperationNotSupportedException(key, cmd, vals);
 				case Response.OutOfMemory:
-					throw new ServerOutOfMemoryException(key, cmd, vals);
+					throw new CacheServerOutOfMemoryException(key, cmd, vals);
 				case Response.TemporaryFailure:
 					throw new TemporaryFailureException(key, cmd, vals);
 				case Response.UnknownCommand:

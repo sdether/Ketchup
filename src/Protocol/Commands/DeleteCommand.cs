@@ -26,15 +26,16 @@ namespace Ketchup.Protocol.Commands
 			return Bucket.QueueOperation(node, packet, Process, Error, this);
 		}
 
-		public void Process(byte[] response, object command) 
+		public void Process(byte[] response, object command)
 		{
 			var cmd = (DeleteCommand)command;
 			try
 			{
-				new PacketHeader(response);
+				new Packet<object>(response).Value();
 				if (cmd.Success != null) cmd.Success(cmd.State);
 			}
-			catch(Exception ex) {
+			catch (Exception ex)
+			{
 				if (cmd.Error != null) cmd.Error(ex, cmd.State);
 			}
 		}

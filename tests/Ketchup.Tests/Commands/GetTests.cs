@@ -22,7 +22,6 @@ namespace Ketchup.Tests.Commands
 		public void GetWithMiss()
 		{
 			var key = "get-miss";
-			bucket.Delete(key);
 			var result = bucket.Get<string>(key);
 			Assert.Null(result);
 		}

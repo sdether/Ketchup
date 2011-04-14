@@ -88,7 +88,7 @@ namespace Ketchup.Config
 			BufferSize = 1024;
 			MaxPooledSockets = 10;
 			MaxPooledSocketWait = 5;
-			SyncCommandTimeout = 5;
+			SyncCommandTimeout = 120;
 			DefaultExpiration = 0;
 		}
 

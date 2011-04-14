@@ -20,10 +20,5 @@ namespace Ketchup.Sync
 
 			return value;
 		}
-
-		public static object Get(this Bucket bucket, string key)
-		{
-			return Get<object>(bucket, key);
-		}
 	}
 }

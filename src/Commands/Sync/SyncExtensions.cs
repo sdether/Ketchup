@@ -13,10 +13,7 @@ namespace Ketchup
 
 			action(
 				//delegate to invoke on success
-				s =>
-				{
-					resetEvent.Set();
-				},
+				s => resetEvent.Set(),
 
 				//delegate to invoke on test error
 				(e, s) =>

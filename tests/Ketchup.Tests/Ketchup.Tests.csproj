@@ -47,7 +47,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Commands\GetTests.cs" />
-    <Compile Include="Commands\SetAddReplaceTests.cs" />
+    <Compile Include="Commands\SetTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers.cs" />

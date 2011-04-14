@@ -41,9 +41,19 @@ namespace QuietExample
                 (exceptionDelete, stateDelete) =>
                 {
                     Console.WriteLine("Delete command for key " + key + " failed.");
+                	Finish();
                 },
                 state
             );
+
+        	Console.ReadLine();
         }
+
+		private static void Finish()
+		{
+			Console.WriteLine("Pess any key to continue...");
+			Console.ReadLine();
+		}
+
     }
 }

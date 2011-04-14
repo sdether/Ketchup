@@ -19,7 +19,7 @@ namespace Ketchup.Tests.Commands
 			var success = bucket.Set(key, value);
 			Assert.True(success);
 
-			var actual = bucket.Get(key);
+			var actual = bucket.Get<string>(key);
 			Assert.Equal(value, actual);
 
 			success = bucket.Delete(key);
@@ -44,7 +44,7 @@ namespace Ketchup.Tests.Commands
 			Assert.True(success);
 			Thread.Sleep(2 * 1000);
 			
-			var result = bucket.Get(key);
+			var result = bucket.Get<string>(key);
 			Assert.Null(result);
 		}
 

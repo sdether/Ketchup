@@ -98,7 +98,6 @@ namespace Ketchup
 			{
 				//at least retry timeouts the specified number of times
 				if (ex.SocketErrorCode == SocketError.TimedOut) return HandleTimeout(socket);
-				throw;
 			}
 
 			return socket;

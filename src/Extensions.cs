@@ -4,49 +4,58 @@ using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
-namespace Ketchup {
-	public static class Extensions {
+namespace Ketchup
+{
+	public static class Extensions
+	{
 
-		public static byte[] CopyTo(this short value, byte[] destination, int index, int length = 2) {
+		public static byte[] CopyTo(this short value, byte[] destination, int index, int length = 2)
+		{
 			var source = BitConverter.GetBytes(value);
 			CopyTo(source, length, destination, index);
 			return destination;
 		}
 
-		public static byte[] CopyTo(this int value, byte[] destination, int index, int length = 4) {
+		public static byte[] CopyTo(this int value, byte[] destination, int index, int length = 4)
+		{
 			var source = BitConverter.GetBytes(value);
 			CopyTo(source, length, destination, index);
 			return destination;
 		}
 
-		public static byte[] CopyTo(this long value, byte[] destination, int index, int length = 8) {
+		public static byte[] CopyTo(this long value, byte[] destination, int index, int length = 8)
+		{
 			var source = BitConverter.GetBytes(value);
 			CopyTo(source, length, destination, index);
 			return destination;
 		}
 
-		private static void CopyTo(byte[] source, int length, byte[] destination, int index) {
+		private static void CopyTo(byte[] source, int length, byte[] destination, int index)
+		{
 			var a = new byte[length];
 			Array.Copy(source, 0, a, 0, length);
 			Array.Reverse(a);
 			Array.Copy(a, 0, destination, index, length);
 		}
 
-		public static short GetInt16(this byte[] bytes, int index, int length = 2) {
+		public static short GetInt16(this byte[] bytes, int index, int length = 2)
+		{
 			var a = new byte[length];
 			Array.Copy(bytes, index, a, 0, length);
 			Array.Reverse(a);
 			return BitConverter.ToInt16(a, 0);
 		}
 
-		public static int GetInt32(this byte[] bytes, int index, int length = 4) {
+		public static int GetInt32(this byte[] bytes, int index, int length = 4)
+		{
 			var a = new byte[length];
 			Array.Copy(bytes, index, a, 0, length);
 			Array.Reverse(a);
 			return BitConverter.ToInt32(a, 0);
 		}
 
-		public static long GetInt64(this byte[] bytes, int index, int length = 8) {
+		public static long GetInt64(this byte[] bytes, int index, int length = 8)
+		{
 			var a = new byte[length];
 			Array.Copy(bytes, index, a, 0, length);
 			Array.Reverse(a);
@@ -59,12 +68,14 @@ namespace Ketchup {
 			return bytes;
 		}
 
-		public static byte[] GetBytes<T>(this T obj) {
-			if (obj == null) 
+		public static byte[] GetBytes<T>(this T obj)
+		{
+			if (obj == null)
 				return new byte[0];
 
 			var value = (object)obj;
-			switch (Type.GetTypeCode(typeof(T))) {
+			switch (Type.GetTypeCode(typeof(T)))
+			{
 				case TypeCode.DBNull:
 					return new byte[0];
 
@@ -75,7 +86,7 @@ namespace Ketchup {
 					return BitConverter.GetBytes((bool)value).Reverse();
 
 				case TypeCode.Int16:
-					return BitConverter.GetBytes((short)value).Reverse(); 
+					return BitConverter.GetBytes((short)value).Reverse();
 
 				case TypeCode.Int32:
 					return BitConverter.GetBytes((int)value).Reverse();
@@ -105,19 +116,22 @@ namespace Ketchup {
 					return BitConverter.GetBytes((float)value).Reverse();
 
 				default:
-					using (var ms = new MemoryStream()) {
+					using (var ms = new MemoryStream())
+					{
 						new BinaryFormatter().Serialize(ms, value);
 						return ms.ToArray();
 					}
 			}
 		}
 
-		public static T GetObject<T>(this byte[] bytes) {
+		public static T GetObject<T>(this byte[] bytes)
+		{
 			if (bytes.Length == 0) return default(T);
 
 			object obj;
 
-			switch (Type.GetTypeCode(typeof(T))) {
+			switch (Type.GetTypeCode(typeof(T)))
+			{
 				case TypeCode.DBNull:
 					obj = DBNull.Value;
 					break;
@@ -171,7 +185,8 @@ namespace Ketchup {
 					break;
 
 				default:
-					using (var ms = new MemoryStream(bytes)) {
+					using (var ms = new MemoryStream(bytes))
+					{
 						obj = new BinaryFormatter().Deserialize(ms);
 					}
 					break;
@@ -184,7 +199,8 @@ namespace Ketchup {
 		{
 			var bytes = new byte[size];
 			var index = 0;
-			foreach (var listb in list) {
+			foreach (var listb in list)
+			{
 				var left = size - index;
 				var length = left < listb.Length ? left : listb.Length;
 				Array.Copy(listb, 0, bytes, index, length);
