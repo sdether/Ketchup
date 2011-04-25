@@ -3,7 +3,7 @@ using System.Threading;
 using Enyim.Caching;
 using Enyim.Caching.Memcached;
 using Ketchup.Async;
-using Ketchup.Commands;
+using Ketchup.Sync;
 
 namespace Ketchup.Demo
 {
@@ -13,18 +13,20 @@ namespace Ketchup.Demo
 
 		static void Main(string[] args)
 		{
-			ReadLine();
+			Run();
 		}
 
-		private static void ReadLine()
+		private static void Run()
 		{
 			Console.WriteLine("Enter the number of operations or enter to quit");
 			var numberOfOperations = 0;
 			if (!int.TryParse(Console.ReadLine(), out numberOfOperations)) return;
+			
 			var ecli = new MemcachedClient();
 			var kcli = new KetchupClient();
 			var bucket = kcli.GetBucket("default");
 			var etime = 0d;
+
 			Console.WriteLine("Number of Operations: " + numberOfOperations);
 			if (!debugAsync)
 			{
@@ -42,7 +44,7 @@ namespace Ketchup.Demo
 				Console.WriteLine("Ketchup Async: " + ktimea + " seconds (" + ptimea + "% faster)");
 			}
 
-			ReadLine();
+			Run();
 		}
 
 		public static double SetAndGetEnyim(int numberOfOperations, IMemcachedClient cli)
@@ -54,21 +56,13 @@ namespace Ketchup.Demo
 			{
 				var key = "ey" + i;
 				var value = key + " value";
-				if (cli.Store(StoreMode.Set, key, value))
-				{
-					//Console.WriteLine(key + ": set ");
-				}
-				else
-				{
-					throw new Exception("Enyim fail on set");
-				}
+				cli.Store(StoreMode.Set, key, value);
 			}
 
 			for (var i = 0; i < numberOfOperations; i++)
 			{
 				var key = "ey" + i;
 				var value = cli.Get(key);
-				//Console.WriteLine(key + ": " + (value == null ? "miss" : value));
 			}
 
 			return (DateTime.Now - start).TotalSeconds;
@@ -78,12 +72,12 @@ namespace Ketchup.Demo
 		{
 			var start = DateTime.Now;
 
-			//for (var i = 0; i < numberOfOperations; i++)
-			//{
-			//    var key = "kc" + i;
-			//    var value = key + " value";
-			//    cli.Set(key, value);
-			//}
+			for (var i = 0; i < numberOfOperations; i++)
+			{
+			    var key = "kc" + i;
+			    var value = key + " value";
+			    cli.Set(key, value);
+			}
 
 			for (var i = 0; i < numberOfOperations; i++)
 			{
@@ -117,8 +111,7 @@ namespace Ketchup.Demo
 					var value = key + " value";
 					var bucket = "default";
 					object asyncState = new DemoAsyncState { Key = key };
-					cli.Set(key, value,
-						s =>
+					cli.Set(key, value, s =>
 						{
 							lock (sync)
 							{
@@ -141,27 +134,29 @@ namespace Ketchup.Demo
 
 					//get is fired on success return of set
 					var asyncState = new DemoAsyncState { Key = key, Counter = counter };
-					cli.Get<string>(key, (val, s) =>
-					{
-						lock (sync)
+					cli.Get<string>(key, 
+						(val, s) =>
 						{
-							dynamic state = s;
-							var c = --counter;
-							if (debugAsync) Console.WriteLine(c + ": " + state.Key + ": " + val);
-							if (c == 0) success(s);
-						}
-					},
-					s1 =>
-					{
-						lock (sync)
+							lock (sync)
+							{
+								dynamic state = s;
+								var c = --counter;
+								if (debugAsync) Console.WriteLine(c + ": " + state.Key + ": " + val);
+								if (c == 0) success(s);
+							}
+						},
+						s1 =>
 						{
-							dynamic state1 = s1;
-							var c1 = --counter;
-							if (debugAsync) Console.WriteLine(c1 + ": " + state1.Key + ": miss");
-							if (c1 == 0) success(s1);
-						}
-					},
-					fail, asyncState);
+							lock (sync)
+							{
+								dynamic state1 = s1;
+								var c1 = --counter;
+								if (debugAsync) Console.WriteLine(c1 + ": " + state1.Key + ": miss");
+								if (c1 == 0) success(s1);
+							}
+						},
+						fail, asyncState
+					);
 				}
 			});
 
@@ -170,7 +165,7 @@ namespace Ketchup.Demo
 
 		public static void TestAsync(int seconds, Action<Action<object>, Action<Exception, object>> action)
 		{
-			var resetEvent = new ManualResetEvent(initialState: false);
+			var resetEvent = new ManualResetEvent(false);
 			Exception exception = null;
 
 			action(
@@ -193,38 +188,5 @@ namespace Ketchup.Demo
 			if (exception != null)
 				throw exception;
 		}
-
-		//public static void CreateConfigSection()
-		//{
-		//    var section = KetchupConfigSection.Current;
-		//    var config = KetchupConfig.Current;
-		//}
-		//public static void GetValueWithKey()
-		//{
-		//    var cli = new KetchupClient("default");
-		//    for (var i = 0; i < 100; i++)
-		//    {
-		//        var misses = 0;
-		//        var j = i;
-		//        Console.WriteLine("get " + i + " at " + DateTime.Now);
-		//        cli.Get<string>(
-		//        "Hello",
-
-		//        (val) => Console.WriteLine("hit " + j + " at " + DateTime.Now + ". value: " + val),
-		//            //miss
-		//        () =>
-		//        {
-		//            Console.WriteLine("miss " + j + " at " + DateTime.Now);
-		//            misses++;
-		//            Console.WriteLine("total misses: " + misses);
-		//        },
-		//            //error
-		//        (ex) =>
-		//        {
-		//            Console.WriteLine("error " + j + " at " + DateTime.Now);
-		//            Console.Write(ex);
-		//        });
-		//    }
-		//}
 	}
 }
