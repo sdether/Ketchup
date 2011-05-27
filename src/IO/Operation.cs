@@ -20,9 +20,8 @@ namespace Ketchup.IO
 		public readonly IList<byte[]> Buffers = new List<byte[]>();
 		public Action<byte[], object> Process { get; private set; }
 		public Action<Exception, object> Error { get; private set; }
-		public EventLoop EventLoop { private get; set; }
-		public Node Node { get; set; }
 		
+		public Node Node { get; set; }
 
 		public Socket Socket 
 		{
@@ -34,26 +33,32 @@ namespace Ketchup.IO
 			get { return _result ?? (_result = Buffers.ToByteArray(TotalSize)); }
 		}
 
-		public Operation(byte[] packet, Node node)
+		public Operation(Node node, byte[] packet)
 		{
 			Node = node;
 			Packet = packet;
 		}
 
-		public Operation(byte[] packet, Node node,
+		public Operation(Node node, byte[] packet, 
 			Action<byte[], object> process,
 			Action<Exception, object> error,
 			object state)
-			: this(packet, node)
+			: this(node, packet)
 		{
 			Process = process;
 			Error = error;
 			State = state;
 		}
-
-		public Operation QueueProcess()
+		
+		public Operation Send()
 		{
-			EventLoop.QueueProcess(this);
+			SocketIO.Send(this);
+			return this;
+		}
+
+		public Operation OnReceive()
+		{
+			Process(Result,State);
 			Node.ReleaseSocket(_socket);
 			return this;
 		}

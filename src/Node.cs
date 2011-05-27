@@ -105,12 +105,10 @@ namespace Ketchup
 
 		private static Socket CreateSocket()
 		{
-			var config = KetchupConfig.Current;
-
 			return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 			{
-				SendTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
-				ReceiveTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
+				//SendTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
+				//ReceiveTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
 				NoDelay = true,
 				Blocking = true,
 				UseOnlyOverlappedIO = false,

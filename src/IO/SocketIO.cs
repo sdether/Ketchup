@@ -9,20 +9,27 @@ namespace Ketchup.IO
 
 		public static void Send(Operation op)
 		{
-			op.Socket.BeginSend(
-				op.Packet, 0, op.Packet.Length,
-				SocketFlags.None, SendData, op
-			);
+			Console.WriteLine("Sending...");
+			//op.Socket.BeginSend(
+			//	op.Packet, 0, op.Packet.Length,
+			//	SocketFlags.None, SendData, op
+			//);
+			op.Socket.Send(op.Packet,0,op.Packet.Length,SocketFlags.None);
 			Receive(op);
 		}
 
 		private static void Receive(Operation op)
 		{
 			op.Buffer = new byte[_size];
-			op.Socket.BeginReceive(
-				op.Buffer, 0, _size,
-				SocketFlags.None, ReceiveData, op
-			);
+			var read = op.Socket.Receive(op.Buffer, 0, op.Buffer.Length, SocketFlags.None);
+			op.Buffers.Add(op.Buffer);
+			op.TotalSize += read;
+			if (read < _size) op.OnReceive();
+			else Receive(op);			
+			//op.Socket.BeginReceive(
+			//	op.Buffer, 0, _size,
+			//	SocketFlags.None, ReceiveData, op
+			//);
 		}
 
 		private static void SendData(IAsyncResult asyncResult)
@@ -37,7 +44,7 @@ namespace Ketchup.IO
 			var read = op.Socket.EndReceive(asyncResult);
 			op.Buffers.Add(op.Buffer);
 			op.TotalSize += read;
-			if (read < _size) op.QueueProcess();
+			if (read < _size) op.OnReceive();
 			else Receive(op);
 		}
 	}

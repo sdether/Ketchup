@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ketchup.Protocol.Commands;
+using Ketchup.IO;
 
 namespace Ketchup {
 	public class Bucket {
@@ -22,7 +23,8 @@ namespace Ketchup {
 		}
 
 		public Bucket QueueOperation(Node node, byte[] packet, Action<byte[], object> process, Action<Exception, object> error, object command) {
-			Client.QueueOperation(node, packet, process, error, command);
+			var op = new Operation(node, packet, process, error, command);
+			op.Send();
 			return this;
 		}
 

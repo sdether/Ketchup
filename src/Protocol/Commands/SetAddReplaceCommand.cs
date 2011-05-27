@@ -7,8 +7,6 @@ namespace Ketchup.Protocol.Commands
 {
 	public class SetAddReplaceCommand<T> : ICommand
 	{
-		private static readonly KetchupConfig config = KetchupConfig.Current;
-
 		public Bucket Bucket { get; set; }
 		public string Key { get; set; }
 		public T Value { get; set; }

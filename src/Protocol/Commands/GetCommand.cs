@@ -9,7 +9,6 @@ namespace Ketchup.Protocol.Commands
 {
 	public class GetCommand<T> : ICommand
 	{
-		private static readonly KetchupConfig config = KetchupConfig.Current;
 		public Bucket Bucket { get; set; }
 		public string Key { get; set; }
 		public object State { get; set; }
