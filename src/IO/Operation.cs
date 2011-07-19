@@ -65,10 +65,9 @@ namespace Ketchup.IO
 		
 		public Operation OnReceive()
 		{
+			Node.ReleaseSocket(_socket);
 			if(EventLoop != null) EventLoop.QueueProcess(this);
 			else Process(Result,State);
-			Node.ReleaseSocket(_socket);
-			_socket = null;
 			return this;
 		}
 	}

@@ -1,15 +1,39 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="examples/mono/MonoAsynchronousBenchmark/Main.cs" ctype="Workbench">
+  <MonoDevelop.Ide.Workbench ActiveDocument="examples/mono/MonospaceAsyncSetExample/Main.cs" ctype="Workbench">
     <Files>
-      <File FileName="src/IO/SocketIO.cs" Line="33" Column="3" />
-      <File FileName="examples/mono/MonoAsynchronousExample/Main.cs" Line="17" Column="27" />
+      <File FileName="src/IO/SocketIO.cs" Line="40" Column="16" />
+      <File FileName="examples/mono/MonoAsynchronousExample/Main.cs" Line="37" Column="18" />
       <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System/Enum.cs" Line="400" Column="25" />
       <File FileName="examples/mono/MonoAsynchronousExample/AssemblyInfo.cs" Line="1" Column="1" />
-      <File FileName="examples/mono/MonoAsynchronousBenchmark/Main.cs" Line="14" Column="10" />
+      <File FileName="examples/mono/MonoAsynchronousBenchmark/Main.cs" Line="23" Column="34" />
       <File FileName="examples/AsynchronousPerformanceExample/Program.cs" Line="193" Column="1" />
-      <File FileName="Assembly Browser" />
       <File FileName="src/KetchupClient.cs" Line="55" Column="50" />
+      <File FileName="examples/mono/MonoAsynchronousBenchmark/AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="examples/mono/MonoSpymemcachedLikeExample/Main.cs" Line="14" Column="24" />
+      <File FileName="src/Config/KetchupConfig.cs" Line="100" Column="28" />
+      <File FileName="examples/mono/MonospaceAsyncSetExample/Main.cs" Line="51" Column="6" />
+      <File FileName="src/Commands/SetExtensions.cs" Line="1" Column="1" />
+      <File FileName="src/Commands/Async/AsyncSetExtensions.cs" Line="19" Column="8" />
+      <File FileName="src/Node.cs" Line="35" Column="1" />
+      <File FileName="src/Commands/Sync/SyncGetExtensions.cs" Line="11" Column="1" />
+      <File FileName="src/Commands/Sync/SyncExtensions.cs" Line="34" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System/MarshalByRefObject.cs" Line="48" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System.Threading/WaitHandle.cs" Line="358" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System.Threading/EventWaitHandle.cs" Line="131" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System.Threading/ManualResetEvent.cs" Line="47" Column="1" />
+      <File FileName="src/Protocol/Commands/SetAddReplaceCommand.cs" Line="47" Column="4" />
+      <File FileName="src/Bucket.cs" Line="31" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System.Collections.Generic/List.cs" Line="52" Column="1" />
+      <File FileName="src/IO/Operation.cs" Line="65" Column="3" />
+      <File FileName="src/System.Threading/ConcurrentQueue.cs" Line="102" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/System/System.Net.Sockets/Socket.cs" Line="997" Column="1" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System/String.cs" Line="1962" Column="1" />
+      <File FileName="src/Protocol/Commands/GetCommand.cs" Line="32" Column="1" />
+      <File FileName="src/Protocol/Commands/FlushCommand.cs" Line="1" Column="1" />
+      <File FileName="src/Protocol/Commands/DeleteCommand.cs" Line="28" Column="24" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/System/System.Net.Sockets/Socket_2_1.cs" Line="1766" Column="1" />
+      <File FileName="src/Commands/Sync/SyncSetExtensions.cs" Line="14" Column="26" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
