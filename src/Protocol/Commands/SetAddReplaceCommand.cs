@@ -29,7 +29,7 @@ namespace Ketchup.Protocol.Commands
 			Expiration.CopyTo(extras, 4);
 			var packet = new Packet<T>(opcode, Bucket.ModifiedKey(Key)).Extras(extras).Value(Value).Serialize();
 			var node = Hasher.GetNode(Bucket, Key);
-			return Bucket.QueueOperation(node, packet, Process, Error, this);
+			return Bucket.Operate(node, packet, Process, Error, this);
 		}
 
 		public void Process(byte[] response, object command)
@@ -48,17 +48,23 @@ namespace Ketchup.Protocol.Commands
 
 		public Bucket Set()
 		{
-			var op = Success == null ? Op.SetQ : Op.Set;
+			//TODO: all commands must return a value, no timeout on receive 
+			//var op = Success == null ? Op.SetQ : Op.Set;
+			var op = Op.Set;
 			return SetAddReplace(op);
 		}
 		public Bucket Add()
 		{
-			var op = Success == null ? Op.AddQ : Op.Add;
+			//TODO: all commands must return a value, no timeout on receive 
+			//var op = Success == null ? Op.AddQ : Op.Add;
+			var op = Op.Add;
 			return SetAddReplace(op);
 		}
 		public Bucket Replace()
 		{
-			var op = Success == null ? Op.ReplaceQ : Op.Replace;
+			//TODO: all commands must return a value, no timeout on receive 
+			//var op = Success == null ? Op.ReplaceQ : Op.Replace;
+			var op = Op.Replace;
 			return SetAddReplace(op);
 		}
 	}

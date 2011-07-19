@@ -105,15 +105,21 @@ namespace Ketchup
 
 		private static Socket CreateSocket()
 		{
-			return new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
+			var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 			{
-				//SendTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
-				//ReceiveTimeout = (int)config.ConnectionTimeout.TotalMilliseconds,
 				NoDelay = true,
 				Blocking = true,
 				UseOnlyOverlappedIO = false,
 				DontFragment = true,
 			};
+			
+			var config = KetchupConfig.Current;
+			if(config.UseEventLoop)
+				socket.SendTimeout = 
+				socket.ReceiveTimeout = 
+				(int)config.SendReceiveTimeout.TotalMilliseconds;
+			
+			return socket;
 		}
 
 		private bool ReadyToTry()

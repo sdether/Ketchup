@@ -25,12 +25,11 @@ namespace Ketchup
 			var timeout = KetchupConfig.Current.SyncCommandTimeout;
 			if (!resetEvent.WaitOne(timeout * 1000))
 				throw new TimeoutException(
-					string.Format(
+				string.Format(
 						"Command timed out on before async response was returned.\nCommand: {0}\nKey: {1}",
 						command,
 						key
 					));
-
 			if (exception != null)
 				throw exception;
 		}

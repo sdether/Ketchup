@@ -20,7 +20,7 @@ namespace Ketchup.IO
 		public readonly IList<byte[]> Buffers = new List<byte[]>();
 		public Action<byte[], object> Process { get; private set; }
 		public Action<Exception, object> Error { get; private set; }
-		
+		public EventLoop EventLoop { private get; set; }
 		public Node Node { get; set; }
 
 		public Socket Socket 
@@ -50,16 +50,25 @@ namespace Ketchup.IO
 			State = state;
 		}
 		
-		public Operation Send()
+		public Operation BeginSend()
 		{
-			SocketIO.Send(this);
+			SocketIO.BeginSend(this);
 			return this;
 		}
-
+		
+		public Operation OnSend()
+		{
+			//TODO: Use this method to timeout the socket if no response received
+			SocketIO.BeginReceive(this);
+			return this;
+		}
+		
 		public Operation OnReceive()
 		{
-			Process(Result,State);
+			if(EventLoop != null) EventLoop.QueueProcess(this);
+			else Process(Result,State);
 			Node.ReleaseSocket(_socket);
+			_socket = null;
 			return this;
 		}
 	}

@@ -4,33 +4,29 @@ using Ketchup.Interfaces;
 
 namespace Ketchup.Protocol.Commands
 {
-	public class DeleteCommand : ICommand
+	public class FlushCommand : ICommand
 	{
 		public Bucket Bucket { get; set; }
-		public string Key { get; set; }
 		public object State { get; set; }
 		public Action<object> Success { get; set; }
 		public Action<Exception, object> Error { get; set; }
 
-		public DeleteCommand(Bucket bucket, string key)
+		public FlushCommand(Bucket bucket)
 		{
 			Bucket = bucket;
-			Key = key;
 		}
 
-		public Bucket Delete()
+		public Bucket Flush()
 		{
-			//TODO: all commands must return a value, no timeout on receive 
-			//var cmd = Success == null ? Op.DeleteQ : Op.Delete;
-			var cmd = Op.Delete;
-			var packet = new Packet<string>(cmd, Bucket.ModifiedKey(Key)).Serialize();
-			var node = Hasher.GetNode(Bucket, Key);
+			var cmd = Success == null ? Op.FlushQ : Op.Flush;
+			var packet = new Packet<string>(cmd).Serialize();
+			var node = Hasher.GetNode(Bucket, "1");
 			return Bucket.Operate(node, packet, Process, Error, this);
 		}
 
 		public void Process(byte[] response, object command)
 		{
-			var cmd = (DeleteCommand)command;
+			var cmd = (FlushCommand)command;
 			try
 			{
 				new Packet<object>(response).Value();

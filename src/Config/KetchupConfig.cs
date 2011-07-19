@@ -73,6 +73,16 @@ namespace Ketchup.Config
 		/// The default expiration time for new keys when no expiration is specified, default is 0 (never expires)
 		/// </summary>
 		public int DefaultExpiration { get; set; }
+		
+		/// <summary>
+		/// Specifies asynchronous method, if true, uses an internal event loop, if false, uses IOCP and asynchronous socket methods, defaults to false
+		/// </summary>
+		public bool UseEventLoop { get; set; }
+		
+		/// <summary>
+		/// The number of milliseconds to wait for a receive message from the memcached server on a synchronous connection, defaults to 1000
+		/// </summary>
+		public TimeSpan SendReceiveTimeout { get; set; }
 
 		#endregion
 
@@ -88,8 +98,10 @@ namespace Ketchup.Config
 			BufferSize = 1024;
 			MaxPooledSockets = 10;
 			MaxPooledSocketWait = 5;
-			SyncCommandTimeout = 120;
+			SyncCommandTimeout = 5;
 			DefaultExpiration = 0;
+			UseEventLoop = false;
+			SendReceiveTimeout = new TimeSpan(0,0,1);
 		}
 
 		public KetchupConfig AddBucket(string name = "default", int port = 0, bool prefix = true)

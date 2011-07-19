@@ -7,6 +7,8 @@ namespace Ketchup {
 
 	public class KetchupClient 
 	{
+		private readonly EventLoop loop;
+		
 		public Bucket DefaultBucket
 		{
 			get 
@@ -18,6 +20,7 @@ namespace Ketchup {
 		public KetchupClient(KetchupConfig config)
 		{
 			config.Init(this);
+			if(config.UseEventLoop) loop = new EventLoop();
 		}
 
 		public KetchupClient()
@@ -34,7 +37,13 @@ namespace Ketchup {
 			: this(new KetchupConfig().AddNode(endpoint).AddBucket())
 		{
 		}
-
+		
+		public KetchupClient QueueOperation(Operation op)
+		{
+			op.EventLoop = loop;
+			loop.QueueSend(op);
+			return this;
+		}
 
 		public Bucket GetBucket(string bucketName) 
 		{

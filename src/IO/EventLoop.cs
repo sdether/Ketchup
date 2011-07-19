@@ -8,14 +8,21 @@ namespace Ketchup.IO
 		private readonly ManualResetEventSlim _handle = new ManualResetEventSlim(true);
 		private readonly ConcurrentQueue<Operation> _sendQueue = new ConcurrentQueue<Operation>();
 		private readonly ConcurrentQueue<Operation> _processQueue = new ConcurrentQueue<Operation>();
+		
+		public EventLoop()
+		{
+			Start();
+		}
 
-		public void Start()
+		private EventLoop Start()
 		{
 			new Thread(Run)
 			{
 				IsBackground = true,
 				Name = "Ketchup.IO.EventLoop"
 			}.Start(this);
+			
+			return this;
 		}
 
 		private static void Run(object state)
@@ -23,7 +30,8 @@ namespace Ketchup.IO
 			var loop = (EventLoop)state;
 			while (true)
 			{
-				loop.WaitIfEmpty();
+				//loop.WaitIfEmpty();
+				Thread.Sleep(10);
 				loop.Process();
 				loop.Send();
 			}
@@ -31,7 +39,6 @@ namespace Ketchup.IO
 
 		public void QueueSend(Operation op)
 		{
-			op.EventLoop = this;
 			_sendQueue.Enqueue(op);
 			_handle.Set();
 		}
@@ -58,8 +65,9 @@ namespace Ketchup.IO
 		private void Send()
 		{
 			Operation op;
-			if (!_sendQueue.TryDequeue(out op)) return;
-			SocketIO.Send(op);
+			_sendQueue.TryDequeue(out op);
+			if(op != null) 
+				SocketIO.Send(op);
 		}
 	}
 }

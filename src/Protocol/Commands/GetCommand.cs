@@ -24,10 +24,12 @@ namespace Ketchup.Protocol.Commands
 
 		public Bucket Get()
 		{
-			var cmd = Miss == null ? Op.GetQ : Op.Get;
+			//TODO: all commands must return a value, no timeout on receive 
+			//var cmd = Miss == null ? Op.GetQ : Op.Get;
+			var cmd = Op.Get;
 			var packet = new Packet<T>(cmd, Bucket.ModifiedKey(Key)).Serialize();
 			var node = Hasher.GetNode(Bucket, Key);
-			return Bucket.QueueOperation(node, packet, Process, Error, this);
+			return Bucket.Operate(node, packet, Process, Error, this);
 		}
 
 		public void Process(byte[] response, object command)

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Ketchup</RootNamespace>
     <AssemblyName>Ketchup</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -36,7 +36,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -92,6 +91,17 @@
     </Compile>
     <Compile Include="Commands\GetExtensions.cs" />
     <Compile Include="Commands\Sync\SyncExtensions.cs" />
+    <Compile Include="IO\EventLoop.cs" />
+    <Compile Include="System.Threading\ConcurrentQueue.cs" />
+    <Compile Include="System.Threading\ManualResetEventSlim.cs" />
+    <Compile Include="System.Threading\IProducerConsunmerCollection.cs" />
+    <Compile Include="System.Threading\SpinWait.cs" />
+    <Compile Include="Protocol\Commands\FlushCommand.cs" />
+    <Compile Include="Commands\FlushExtensions.cs" />
+    <Compile Include="Commands\Sync\SyncFlushExtensions.cs" />
+    <Compile Include="Commands\Silent\SilentFlushExtensions.cs" />
+    <Compile Include="Commands\Quiet\QuietFlushExtensions.cs" />
+    <Compile Include="Commands\Async\AsyncFlushExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -102,4 +112,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="System.Threading\" />
+  </ItemGroup>
 </Project>

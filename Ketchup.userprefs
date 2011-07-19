@@ -1,11 +1,19 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ctype="Workspace" />
-  <MonoDevelop.Ide.Workbench ctype="Workbench" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="examples/mono/MonoAsynchronousBenchmark/Main.cs" ctype="Workbench">
+    <Files>
+      <File FileName="src/IO/SocketIO.cs" Line="33" Column="3" />
+      <File FileName="examples/mono/MonoAsynchronousExample/Main.cs" Line="17" Column="27" />
+      <File FileName="../../Downloads/mono/build/mono-2.10.2/mcs/class/corlib/System/Enum.cs" Line="400" Column="25" />
+      <File FileName="examples/mono/MonoAsynchronousExample/AssemblyInfo.cs" Line="1" Column="1" />
+      <File FileName="examples/mono/MonoAsynchronousBenchmark/Main.cs" Line="14" Column="10" />
+      <File FileName="examples/AsynchronousPerformanceExample/Program.cs" Line="193" Column="1" />
+      <File FileName="Assembly Browser" />
+      <File FileName="src/KetchupClient.cs" Line="55" Column="50" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/sirota/code/Ketchup/src/IO/EventLoop.cs" line="60" />
-      <Breakpoint file="/home/sirota/code/Ketchup/src/IO/EventLoop.cs" line="28" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches ctype="PinnedWatchStore" />
 </Properties>
